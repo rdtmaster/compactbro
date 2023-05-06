@@ -206,6 +206,7 @@ func indent(n int, s string) (res string) {
 	res = strings.ReplaceAll(s, "\n", spaces)
 	return
 }
+
 func processComments(cs []*reddit.Comment) (s string) {
 
 	for _, c := range cs {
@@ -323,6 +324,7 @@ func sub(c echo.Context) error {
 	}
 
 	err = tpls["sub"].Execute(c.Response(), pw)
+	
 
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, err)
