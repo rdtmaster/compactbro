@@ -1,0 +1,63 @@
+mixin postList($p, $ptt)
+	div
+		[class = "thing link id-"+$p.Post.FullID]
+		.stickied ? $p.Post.Stickied
+		span.rank
+		+midcol1($p.LikesInt)
+		if $ptt == "0"
+			div.commentcount
+				a.comments.may-blank[href=$p.Post.Permalink] #{$p.Post.NumberOfComments}
+		div
+			.entry
+			.unvoted ? $p.LikesInt == 0
+			.likes ? $p.LikesInt == 1
+			.dislikes ? $p.LikesInt == -1
+			if $p.HasLinkFlair
+				span.linkflair #{$p.Post.LinkFlairText}
+			p.title
+				a.may-blank[href=$p.Post.Permalink] #{$p.Post.Title}
+				span.domain (self)
+			if $ptt == "0"
+				a.expando-button.collapsed.selftext[href="#"][data-id=$p.Post.FullID]
+			div.tagline
+				span
+					span.score.dislikes #{$p.Post.Score - 1} points
+					span.score.unvoted #{$p.Post.Score} points
+					span.score.likes #{$p.Post.Score + 1} points
+					|&#32;Submitted&#32;
+					time.live-timestamp[title=$p.Post.Created]#{$p.DateAgo}
+				span
+					|&#32;by&#32;
+					span.flairrichtext.flair
+					a
+						[class=$p.Post.Distinguished] ? $p.IsDistinguished
+						.author
+						.may-blank
+						[href="/u/"+$p.Post.Author]
+						|#{$p.Post.Author}
+				if $p.Post.TotalAwards > 0
+					+awardings($p.Post.Awardings)
+		a.options_link[href="#"][data-id=$p.Post.FullID]
+		div.expando
+			.toggleable ? $ptt == "0"
+			[style="display:block"] ? $ptt == "1"
+			[style="display:none"] ? $ptt == "0"
+			form.usertext[action=""][method="POST"][data-id=$p.Post.FullID]
+				input[type="hidden"][name="thing_id"][value=$p.Post.FullID]
+				div.usertext-body #{$p.BodyHTML}
+				if $p.IsMine
+					div.usertext-edit.md-container[style="display:none"]
+						div.md
+							textarea[name="selftext"] #{$p.Post.Body}
+							strong
+								span.error.placeholder.field-body
+							div.usertext-buttons
+								button.save.newbutton[type="submit"] Save
+		div.clear.options_expando[style="display:none"]
+			a[href="#"][onclick="unimpl()"]
+				div.email-icon
+				|Share
+			if $p.IsMine
+				a[href="#"][data-id=$p.Post.FullID].editButton
+					div.edit-icon
+					|Edit

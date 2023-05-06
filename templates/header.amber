@@ -1,0 +1,37 @@
+!!! 5
+html
+	head
+		meta[name="apple-mobile-web-app-status-bar-style"][content="black"]
+		meta
+			[name="viewport"][content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"]
+		meta
+			[http-equiv="Content-Type"]
+			[content="text/html; charset=UTF-8"]
+		
+		link
+			[rel="stylesheet"]
+			[href="/static/compact.css"]
+			[type="text/css"]
+			[media="screen"]
+		title #{Title}
+		script[type="text/javascript"][src="/static/js.js"]
+	body.listing-page.hot-page
+		div#preload
+			div.commentcount
+				div.comments
+				div.comments.preloaded
+		div#topbar
+			div.left
+				a[href="/"]
+					img#header-img[src="/static/reddit.png"]
+			h1
+				span.hover.pagename.redditname
+					a[href="/"] #{Title}
+			div.right
+				a#topmenu_toggle.topbar-options[href="#"]
+			div#top_menu
+				div.menuitem
+					a[href="#"] Log out
+		import subtoolbar
+		div.content
+			block content

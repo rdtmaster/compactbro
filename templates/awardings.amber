@@ -1,0 +1,12 @@
+mixin awardings($aws)
+	span.awardings-bar
+		each $a in $aws
+			a
+				.awarding-link
+				[href="#"]
+				[title=$a.Description]
+					span.awarding-icon-container
+						img
+							.awarding-icon
+							[src=$a.StaticIconURL]
+					#{$a.Count}

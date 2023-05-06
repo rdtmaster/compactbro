@@ -1,0 +1,22 @@
+extends header
+block content
+	import awardings
+	div#siteTable.sitetable.linklisting
+		import midcol
+		import postlist
+		+postList($.WP, "1")
+		div.commentarea
+			div.panestack-title
+				span.title all #{$.WP.Post.NumberOfComments} comments
+			div.menuarea.subtoolbar 
+			form#postComment.usertext.cloneable.warn-on-unload
+				input[type="hidden"][name="thing_id"][value=$.WP.Post.FullID]
+				div.usertext-edit.md-container
+					div.md
+						textarea[name="text"]
+				div.bottom-area
+					div.usertext-buttons
+						span.error.field-text
+						button.newbutton.save[type="submit"] Save
+					div[style="clear:both;"]
+			div.sitetable.nestedlisting #{$.CBody}

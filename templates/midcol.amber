@@ -1,0 +1,18 @@
+mixin midcol1($likes)
+	div
+		.midcol
+		.unvoted ? $likes == 0
+		.likes ? $likes == 1
+		.dislikes ? $likes == -1
+			div
+				.arrow
+				.up
+				.login-required
+				.upmod ? $likes == 1
+				[role="button"]
+			div
+				.arrow
+				.down
+				.login-required
+				.downmod ? $likes == -1
+				[role="button"]

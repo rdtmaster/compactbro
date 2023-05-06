@@ -1,0 +1,8 @@
+extends header
+block content
+	div#siteTable.sitetable.linklisting
+		import postlist
+		import midcol
+		import awardings
+		each $post in Items
+			+postList($post, "0")

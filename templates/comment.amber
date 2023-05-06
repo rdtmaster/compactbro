@@ -1,0 +1,7 @@
+mixin reply($r)
+	h1 $r
+
+mixin comment($c)
+	li #{$c.Body}
+		each $r in $c.Replies
+			+reply($r)

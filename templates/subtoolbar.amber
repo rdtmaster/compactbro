@@ -1,0 +1,6 @@
+div.subtoolbar
+	ul.tabmenu
+		li.selected
+			a.choice[href="#"] hot
+		li.selected
+			a.choice[href="#"] new
