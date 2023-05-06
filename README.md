@@ -24,7 +24,7 @@ Work in progress!
 - Download binary for your operating system
 - Place `templates` and `static` in the same folder (TODO <- automate it with Github Actions)
 - Login to reddit and head over to **preferences** => **apps**, create a new APP. The name could be any (e.g. `compactbro`), type should be `script` and other fields are optional. Note down App ID and secret.
-- create config file `compactbro.toml` in your `<default-config-directory>\compactbro` (if you are unsure of the location, launch the software and it will print the path in uss, create the file there)
+- create config file `compactbro.toml` in your `<default-config-directory>\compactbro` (if you are unsure of the location, launch the software and it will print the path in use, create the file there)
 - Edit the config, it will look like this:
 
 ```toml
