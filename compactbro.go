@@ -6,6 +6,7 @@ import (
 	"html/template"
 	"math"
 	"net/http"
+	"os"
 	"path/filepath"
 
 	"github.com/BurntSushi/toml"
@@ -28,6 +29,7 @@ type CompactConfig struct {
 }
 
 var config CompactConfig
+var server *echo.Echo
 
 type DataWraper[T any] struct {
 	Title string
@@ -38,14 +40,11 @@ type PCWrapper struct {
 	WP *PostWrapper
 }
 type PostWrapper struct {
-	Kind            string
-	LikesInt        int
 	IsDistinguished bool
 	IsMine          bool
 	HasLinkFlair    bool
 	DateAgo         string
 	Post            *reddit.Post
-	BodyHTML        template.HTML
 }
 
 type postEditP struct {
@@ -56,6 +55,19 @@ type postEditP struct {
 var tpls map[string]*template.Template
 
 var client *reddit.Client
+
+func likesInt(l *bool) (likes int) {
+	likes = 0
+	if l != nil {
+		if *l == true {
+			likes = 1
+
+		} else {
+			likes = -1
+		}
+	}
+	return
+}
 
 // Credit: https://www.socketloop.com/tutorials/golang-get-time-duration-in-year-month-week-or-day
 func roundTime(input float64) int {
@@ -129,28 +141,18 @@ func rDate(t *reddit.Timestamp) string {
 	}
 }
 func wrapPost(post *reddit.Post) *PostWrapper {
-	likes := 0
-	if post.Likes != nil {
-		if *(post.Likes) == true {
-			likes = 1
 
-		} else {
-			likes = -1
-		}
-	}
 	return &PostWrapper{
-		Kind:            "listing",
-		LikesInt:        likes,
 		IsMine:          strings.EqualFold(strings.ToLower(client.Username), strings.ToLower(post.Author)),
 		IsDistinguished: len(post.Distinguished) > 0,
 		HasLinkFlair:    len(post.LinkFlairText) > 0,
 		Post:            post,
 		DateAgo:         rDate(post.Created),
-		BodyHTML:        template.HTML(html.UnescapeString(post.Selftext_html)),
 	}
 }
 
 func main() {
+
 	configPath := configdir.LocalConfig("compactbro")
 	err := configdir.MakePath(configPath) // Ensure it exists.
 	if err != nil {
@@ -166,8 +168,11 @@ func main() {
 		fmt.Println(err)
 		return
 	}
-	fmt.Println(config)
 
+	amber.FuncMap["html"] = func(s string) template.HTML {
+		return template.HTML(html.UnescapeString(s))
+	}
+	amber.FuncMap["likesInt"] = likesInt
 	tpls, err = amber.CompileDir("templates",
 		amber.DirOptions{Ext: ".amber", Recursive: true},
 		config.TemplateOptions)
@@ -182,21 +187,32 @@ func main() {
 		fmt.Println("Error Initializing client ", err.Error())
 		return
 	}
-	e := echo.New()
-	e.Static("/static", "static")
+	server = echo.New()
+	server.Static("/static", "static")
 
 	// Middleware
-	e.Use(middleware.Logger())
-	e.Use(middleware.Recover())
+	server.Use(middleware.Logger())
+	server.Use(middleware.Recover())
 
 	// Routes
-	e.GET("/r/:sub", sub)
-	e.GET("/r/:sub/comments/:id/:permalink", submission)
-	e.POST("/post/edit", editPost)
-	e.POST("/comment", submitComment)
+	server.GET("/stop", shutdown)
+	server.GET("/r/:sub", sub)
+	server.GET("/r/:sub/comments/:id/:permalink", submission)
+	server.POST("/post/edit", editPost)
+	server.POST("/comment", submitComment)
 
 	// Start server
-	e.Logger.Fatal(e.Start(":80"))
+	server.Logger.Fatal(server.Start(":80"))
+}
+
+// Shut the server down
+func shutdown(c echo.Context) error {
+	go func() {
+		time.Sleep(500 * time.Millisecond)
+		server.Close()
+		os.Exit(0)
+	}()
+	return c.HTML(200, `<html><head><title>Goodbye</title><body bgcolor="#000123" text="#cdedfe"><h1 style="font-family: tahoma;right: 50%;bottom: 50%;transform: translate(50%,50%);position: absolute">Stopping server...</h1></body></html>`)
 }
 func indent(n int, s string) (res string) {
 	spaces := "\n"
@@ -304,12 +320,12 @@ func sub(c echo.Context) error {
 
 	sr, _, err := client.Subreddit.Get(c.Request().Context(), c.Param("sub"))
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, err)
+		return c.String(http.StatusInternalServerError, err.Error())
 	}
 
 	posts, _, err := client.Subreddit.HotPosts(c.Request().Context(), c.Param("sub"), nil)
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, err)
+		return c.String(http.StatusInternalServerError, err.Error())
 	}
 	start := time.Now()
 
@@ -324,10 +340,9 @@ func sub(c echo.Context) error {
 	}
 
 	err = tpls["sub"].Execute(c.Response(), pw)
-	
 
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, err)
+		return c.String(http.StatusInternalServerError, err.Error())
 	}
 	elapsed := time.Since(start)
 	fmt.Println("--------")

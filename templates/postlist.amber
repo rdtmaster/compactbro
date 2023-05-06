@@ -1,17 +1,18 @@
 mixin postList($p, $ptt)
+	$likes = likesInt($p.Post.Likes)
 	div
 		[class = "thing link id-"+$p.Post.FullID]
 		.stickied ? $p.Post.Stickied
 		span.rank
-		+midcol1($p.LikesInt)
+		+midcol1($likes)
 		if $ptt == "0"
 			div.commentcount
 				a.comments.may-blank[href=$p.Post.Permalink] #{$p.Post.NumberOfComments}
 		div
 			.entry
-			.unvoted ? $p.LikesInt == 0
-			.likes ? $p.LikesInt == 1
-			.dislikes ? $p.LikesInt == -1
+			.unvoted ? $likes == 0
+			.likes ? $likes == 1
+			.dislikes ? $likes == -1
 			if $p.HasLinkFlair
 				span.linkflair #{$p.Post.LinkFlairText}
 			p.title
@@ -44,7 +45,7 @@ mixin postList($p, $ptt)
 			[style="display:none"] ? $ptt == "0"
 			form.usertext[action=""][method="POST"][data-id=$p.Post.FullID]
 				input[type="hidden"][name="thing_id"][value=$p.Post.FullID]
-				div.usertext-body #{$p.BodyHTML}
+				div.usertext-body #{html($p.Post.Selftext_html)}
 				if $p.IsMine
 					div.usertext-edit.md-container[style="display:none"]
 						div.md

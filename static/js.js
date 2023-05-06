@@ -163,10 +163,12 @@ function docOnLoad(){
 	const links = document.getElementsByClassName('link');
 	for (link of links){
 		const editButton = link.getElementsByClassName('editButton')[0];
-		editButton.addEventListener("click",e => {
-			e.preventDefault();
-			editDisplay(editButton);
-		});
+		if(editButton){
+			editButton.addEventListener("click",e => {
+				e.preventDefault();
+				editDisplay(editButton);
+			});
+		}
 		const uf = link.getElementsByClassName('usertext')[0];
 		uf.addEventListener("submit",e => {
 			e.preventDefault();
