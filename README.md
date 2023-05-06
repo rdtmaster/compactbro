@@ -27,7 +27,7 @@ Work in progress!
 - create config file `compactbro.toml` in your `<default-config-directory>\compactbro` (if you are unsure of the location, launch the software and it will print the path in uss, create the file there)
 - Edit the config, it will look like this:
 
-```toml`
+```toml
 EcoMode = false
 [Credentials]
 ID = "<ID>"
@@ -39,6 +39,7 @@ Password = "<My-reddit-password>"
 PrettyPrint = true
 LineNumbers = true
 ```
+
 (*replace values in `<...>` with relevant data, do not include `<` and `>`*)
 
 ## Configuration
