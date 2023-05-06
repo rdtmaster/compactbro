@@ -31,7 +31,7 @@ mixin postList($p, $ptt)
 					|&#32;by&#32;
 					span.flairrichtext.flair
 					a
-						[class=$p.Post.Distinguished] ? $p.IsDistinguished
+						[class=$p.Post.Distinguished] ? strNotEmpty($p.Post.Distinguished)
 						.author
 						.may-blank
 						[href="/u/"+$p.Post.Author]

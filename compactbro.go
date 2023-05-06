@@ -23,7 +23,14 @@ import (
 )
 
 type CompactConfig struct {
-	EcoMode         bool
+	EcoMode      bool
+	LocalAddress string
+	Logging      bool
+	Auth         struct {
+		Use      bool
+		Username string
+		Password string
+	}
 	Credentials     reddit.Credentials
 	TemplateOptions amber.Options
 }
@@ -40,11 +47,10 @@ type PCWrapper struct {
 	WP *PostWrapper
 }
 type PostWrapper struct {
-	IsDistinguished bool
-	IsMine          bool
-	HasLinkFlair    bool
-	DateAgo         string
-	Post            *reddit.Post
+	IsMine       bool
+	HasLinkFlair bool
+	DateAgo      string
+	Post         *reddit.Post
 }
 
 type postEditP struct {
@@ -55,6 +61,10 @@ type postEditP struct {
 var tpls map[string]*template.Template
 
 var client *reddit.Client
+
+func strNotEmpty(s string) bool {
+	return len(s) > 0
+}
 
 func likesInt(l *bool) (likes int) {
 	likes = 0
@@ -71,9 +81,7 @@ func likesInt(l *bool) (likes int) {
 
 // Credit: https://www.socketloop.com/tutorials/golang-get-time-duration-in-year-month-week-or-day
 func roundTime(input float64) int {
-
 	var result float64
-
 	if input < 0 {
 		result = math.Ceil(input - 0.5)
 	} else {
@@ -143,11 +151,10 @@ func rDate(t *reddit.Timestamp) string {
 func wrapPost(post *reddit.Post) *PostWrapper {
 
 	return &PostWrapper{
-		IsMine:          strings.EqualFold(strings.ToLower(client.Username), strings.ToLower(post.Author)),
-		IsDistinguished: len(post.Distinguished) > 0,
-		HasLinkFlair:    len(post.LinkFlairText) > 0,
-		Post:            post,
-		DateAgo:         rDate(post.Created),
+		IsMine:       strings.EqualFold(strings.ToLower(client.Username), strings.ToLower(post.Author)),
+		HasLinkFlair: len(post.LinkFlairText) > 0,
+		Post:         post,
+		DateAgo:      rDate(post.Created),
 	}
 }
 
@@ -173,6 +180,7 @@ func main() {
 		return template.HTML(html.UnescapeString(s))
 	}
 	amber.FuncMap["likesInt"] = likesInt
+	amber.FuncMap["strNotEmpty"] = strNotEmpty
 	tpls, err = amber.CompileDir("templates",
 		amber.DirOptions{Ext: ".amber", Recursive: true},
 		config.TemplateOptions)
@@ -191,8 +199,16 @@ func main() {
 	server.Static("/static", "static")
 
 	// Middleware
-	server.Use(middleware.Logger())
+	if config.Logging {
+		server.Use(middleware.Logger())
+	}
 	server.Use(middleware.Recover())
+
+	if config.Auth.Use {
+		server.Use(middleware.BasicAuth(func(username, password string, c echo.Context) (bool, error) {
+			return strings.EqualFold(username, config.Auth.Username) && password == config.Auth.Password, nil
+		}))
+	}
 
 	// Routes
 	server.GET("/stop", shutdown)
@@ -202,7 +218,7 @@ func main() {
 	server.POST("/comment", submitComment)
 
 	// Start server
-	server.Logger.Fatal(server.Start(":80"))
+	server.Logger.Fatal(server.Start(config.LocalAddress))
 }
 
 // Shut the server down
