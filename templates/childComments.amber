@@ -1,0 +1,4 @@
+import comment
+import midcol
+each $c in $.Comments
+	+comment($c)

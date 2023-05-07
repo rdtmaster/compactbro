@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bytes"
 	"fmt"
 	"html"
 	"html/template"
@@ -64,6 +65,26 @@ var client *reddit.Client
 
 func strNotEmpty(s string) bool {
 	return len(s) > 0
+}
+
+func hasReplies(comment *reddit.Comment) bool {
+	return len(comment.Replies.Comments) > 0
+}
+func processReplies(comments reddit.Replies) string {
+
+	fmt.Println("----------")
+	fmt.Println("in proc replies")
+	fmt.Println("----------")
+	var buf bytes.Buffer
+	err := tpls["childComments"].Execute(&buf, comments)
+	if err != nil {
+		fmt.Println("Error! ", err.Error())
+		return err.Error()
+	}
+	fmt.Println("----------")
+	fmt.Println(buf.String())
+	fmt.Println("----------")
+	return buf.String()
 }
 func isMine(author string) bool {
 	return strings.
@@ -178,6 +199,8 @@ func main() {
 	amber.FuncMap["dateAgo"] = dateAgo
 	amber.FuncMap["likesInt"] = likesInt
 	amber.FuncMap["strNotEmpty"] = strNotEmpty
+	amber.FuncMap["hasReplies"] = hasReplies
+	amber.FuncMap["processReplies"] = processReplies
 	tpls, err = amber.CompileDir("templates",
 		amber.DirOptions{Ext: ".amber", Recursive: true},
 		config.TemplateOptions)
@@ -378,6 +401,32 @@ func sub(c echo.Context) error {
 
 // View post
 func submission(c echo.Context) error {
+	start := time.Now()
+	pc, _, err := client.Post.Get(c.Request().Context(), c.Param("id"))
+	if err != nil {
+		return c.String(http.StatusInternalServerError, err.Error())
+	}
+	pw := struct {
+		PageTitle string
+		Items     []*reddit.Comment
+		WP        *reddit.Post
+	}{}
+	pw.PageTitle = pc.Post.Title
+	pw.Items = pc.Comments
+	pw.WP = pc.Post
+
+	err = tpls["post"].Execute(c.Response(), pw)
+
+	elapsed := time.Since(start)
+	fmt.Println("--------")
+	fmt.Printf("comments rendered in %s", elapsed)
+	fmt.Println()
+	fmt.Println("--------")
+
+	return err
+}
+
+func submission2(c echo.Context) error {
 	start := time.Now()
 	pc, _, err := client.Post.Get(c.Request().Context(), c.Param("id"))
 

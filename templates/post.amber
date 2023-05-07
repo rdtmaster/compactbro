@@ -19,4 +19,7 @@ block content
 						span.error.field-text
 						button.newbutton.save[type="submit"] Save
 					div[style="clear:both;"]
-			div.sitetable.nestedlisting #{$.CBody}
+			div.sitetable.nestedlisting
+				import comment
+				each $c in $.Items
+					+comment($c)
