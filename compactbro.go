@@ -25,8 +25,14 @@ import (
 type CompactConfig struct {
 	EcoMode      bool
 	LocalAddress string
-	Logging      bool
-	Auth         struct {
+	HTTPS        struct {
+		Use          bool
+		LocalAddress string
+		KeyPath      string
+		CRTPath      string
+	}
+	Logging bool
+	Auth    struct {
 		Use      bool
 		Username string
 		Password string
@@ -218,7 +224,22 @@ func main() {
 	server.POST("/comment", submitComment)
 
 	// Start server
-	server.Logger.Fatal(server.Start(config.LocalAddress))
+	go func() {
+		if err := server.Start(config.LocalAddress); err != http.ErrServerClosed {
+			fmt.Println(err)
+		}
+	}()
+	if config.HTTPS.Use {
+		if err := server.StartTLS(config.HTTPS.LocalAddress,
+			config.HTTPS.CRTPath,
+			config.HTTPS.KeyPath); err != http.ErrServerClosed {
+			fmt.Println(err)
+			os.Exit(0)
+
+		}
+	}
+	//server.Logger.Fatal(server.Start(config.LocalAddress))
+
 }
 
 // Shut the server down

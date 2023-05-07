@@ -24,7 +24,15 @@ Work in progress!
 - Download binary for your operating system
 - Place `templates` and `static` in the same folder (TODO <- automate it with Github Actions)
 
-### Configuration
+### Install from source
+```shell
+git clone https://github.com/rdtmaster/compactbro
+cd compactbro
+go mod tidy
+go build
+```
+
+## Configuration
 - Login to reddit and head over to **preferences** => **apps**, create a new APP. The name could be any (e.g. `compactbro`), type should be `script` and other fields are optional. Note down App ID and secret.
 - create config file `compactbro.toml` in your `<default-config-directory>\compactbro` (if you are unsure of the location, launch the software and it will print the path in use, create the file there)
 - Edit the config, it will look like this:
@@ -43,3 +51,37 @@ LineNumbers = true
 ```
 
 (*replace values in `<...>` with relevant data, do not include `<` and `>`*)
+
+### HTTPS
+If you want compactbro to become a drop-in replacement for `i.reddit.com` you need to specify it in your hosts file, on windows it is located at `C:\Windows\System32\drivers\etc/`. Open `hosts` file with text editor of your choice and add the following:
+```
+127.0.0.1 i.reddit.com
+```
+Then save and exit. You can verify it: (press Win+r => type `cmd` => enter and type following command):
+```
+ping i.reddit.com
+```
+You should see `127.0.0.1` IP address; sometimes changes require reboot to become active.
+
+However, the point of doing this is to revive links pointing to `i.reddit.com` so you will need to generate SSL certs.
+```shell
+cd <path-to-compactbro>/certs
+
+openssl ecparam -genkey -name prime256v1 -out key.pem
+
+openssl req -new -sha1 -key key.pem -out csr.csr -subj "/CN=i.reddit.com" -addext "subjectAltName=DNS:i.reddit.com,DNS:i.reddit.com,IP:127.0.0.1"
+
+openssl req -x509 -sha1 -days 365 -key key.pem -in csr.csr -out certificate.pem
+```
+Then open your `compactbro.toml` config file. All HTTPS settings are stored in the respective section which should look like this (you can append it to the end of the file):
+```toml
+[HTTPS]
+Use = true
+LocalAddress = "127.0.0.1:443"
+KeyPath = "/certs/key.pem"
+CRTPath = "/certs/certificate.pem"
+```
+
+This will generate self-signed SSL certificate, which you have to import to your browser as a root CA (for firefox: `settings` => `advanced` => `certificates` => `import`). Most likely the browser still won't allow you to visit `https://i.reddit.com/*` pages due to transport security (because the certificate had changed and could not be verified). Find your firefox profile folder and look for `SiteSecurityServiceState.txt` file. Although this is considered insecure you can simply delete/rename it or find records for `i.reddit.com` and remove them.
+
+You will need to "Add security exception" when visiting https://i.reddit.com for the first time. During these operations you will see a lot of security here-be-dragons-like warnings. In general it is safe to ignore them since you are dealing with certificates you just signed yourself, but note that you do everything at your own risk.
