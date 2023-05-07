@@ -49,21 +49,38 @@ Password = "<My-reddit-password>"
 PrettyPrint = true
 LineNumbers = true
 ```
+replace values in `<...>` with relevant data, do not include `<` and `>`
 
-(*replace values in `<...>` with relevant data, do not include `<` and `>`*)
+### Auth
+Generally there are two strategies of using compactbro: run it locally or on a server. If the former, you don't need any authentication whatsoever, simply fire it up; but running it on a remote server can provide several advantages, namely you don't need to have any additional process launched on your device. A low-end Linux VPS server should suffice and, once you configure Authentication and HTTPS, you can make it a drop-in replacement for `i.reddit.com`.
+You should take into account that without authentication compactbro exposes its interface on `IP:port` specified in the config file. Be careful when choosing the listen address. If you specify `127.0.0.1` it is available only within the realm of your machine; if it is a local address like `192.168.5.5` (or another range used in your LAN) it can be accessed by other users in the same network. And if you choose your WAN IP or use `0.0.0.0`  it becomes available to the whole world (provided you have a direct none-NAT internet connection). The latter option is meant for running the app server-side.
+TLDR: if your app listens on an address available to other people, set up authentication.
+
+Authentication-related settings live in the `[Auth]` section of your `compactbro.toml` file, if you want to enable authentication it should look like this:
+```toml
+[Auth]
+Use = true
+Username = "<username>"
+Password = "<password>"
+```
+Replace values in `<...>` with credentials of your choice; be advised these are basic auth credentials you will use to access the app, they have nothing to do with username/password you use to log into your reddit account, therefore these do not have to match, even though they can if so you choose.
 
 ### HTTPS
-If you want compactbro to become a drop-in replacement for `i.reddit.com` you need to specify it in your hosts file, on windows it is located at `C:\Windows\System32\drivers\etc/`. Open `hosts` file with text editor of your choice and add the following:
+Today majority of websites and apps are overly secure, with HTTPS enforced everywhere. Most resources in fact do not need it. There's nothing wrong about using plain HTTP in most scenarios. Any half sain person understands that if you just want to read the news or even sh1tpost on reddit it should not involve cryptography (which introduces great overhead and a big number of errors). Well, at least not by default. Think twice prior to enabling HTTPS, chances are you don't need it.
+However, if you transmit any data without HTTPS **in theory** it could be intercepted. So in a nutshell, if you use compactbro server-side and you live in a free/democratic country, there's not much to worry about. Yet in case you are concerned about government surveillance or are just a little bit paranoid, there's an option to use HTTPS built into Compactbro. It could come handy if you want compactbro to become a drop-in replacement for `i.reddit.com`. Below are the steps to achieve this. The manual is (work-in-progress), it covers only Windows+Firefox setup but it should work basically anywhere with little changes.
+
+First of all, you need to specify make changes in your hosts file, on windows it is located at `C:\Windows\System32\drivers\etc/`. Open `hosts` file with text editor of your choice and add the following:
 ```
 127.0.0.1 i.reddit.com
 ```
+if you use compactbro on a remote server change `127.0.0.1` to its IP, below we use `127.0.0.1` as a placeholder, don't forget to edit it if needed.
 Then save and exit. You can verify it: (press Win+r => type `cmd` => enter and type following command):
 ```
 ping i.reddit.com
 ```
 You should see `127.0.0.1` IP address; sometimes changes require reboot to become active.
 
-However, the point of doing this is to revive links pointing to `i.reddit.com` so you will need to generate SSL certs.
+The HTTPS however isn't operational yet, since any SSL connection requires a certificate. Install OpenSSL (there are binaries available for most platforms, refer to their site for more info) and generate SSL certs:
 ```shell
 cd <path-to-compactbro>/certs
 
@@ -73,6 +90,8 @@ openssl req -new -sha1 -key key.pem -out csr.csr -subj "/CN=i.reddit.com" -addex
 
 openssl req -x509 -sha1 -days 365 -key key.pem -in csr.csr -out certificate.pem
 ```
+This will generate self-signed SSL certificate, which you have to import to your browser as a trusted root CA (for firefox: `settings` => `advanced` => `certificates` => `import`). Most likely the browser still won't allow you to visit `https://i.reddit.com/*` pages due to transport security (because the certificate had changed and could not be verified). Find your firefox profile folder and look for `SiteSecurityServiceState.txt` file. Although this is considered insecure you can simply delete/rename it or find records for `i.reddit.com` and remove them.
+
 Then open your `compactbro.toml` config file. All HTTPS settings are stored in the respective section which should look like this (you can append it to the end of the file):
 ```toml
 [HTTPS]
@@ -81,7 +100,5 @@ LocalAddress = "127.0.0.1:443"
 KeyPath = "/certs/key.pem"
 CRTPath = "/certs/certificate.pem"
 ```
-
-This will generate self-signed SSL certificate, which you have to import to your browser as a root CA (for firefox: `settings` => `advanced` => `certificates` => `import`). Most likely the browser still won't allow you to visit `https://i.reddit.com/*` pages due to transport security (because the certificate had changed and could not be verified). Find your firefox profile folder and look for `SiteSecurityServiceState.txt` file. Although this is considered insecure you can simply delete/rename it or find records for `i.reddit.com` and remove them.
 
 You will need to "Add security exception" when visiting https://i.reddit.com for the first time. During these operations you will see a lot of security here-be-dragons-like warnings. In general it is safe to ignore them since you are dealing with certificates you just signed yourself, but note that you do everything at your own risk.
