@@ -13,7 +13,7 @@ html
 			[href="/static/compact.css"]
 			[type="text/css"]
 			[media="screen"]
-		title #{Title}
+		title #{PageTitle}
 		script[type="text/javascript"][src="/static/js.js"]
 	body.listing-page.hot-page
 		div#preload
@@ -26,7 +26,7 @@ html
 					img#header-img[src="/static/reddit.png"]
 			h1
 				span.hover.pagename.redditname
-					a[href="/"] #{Title}
+					a[href="/"] #{PageTitle}
 			div.right
 				a#topmenu_toggle.topbar-options[href="#"]
 			div#top_menu

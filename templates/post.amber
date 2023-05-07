@@ -7,10 +7,10 @@ block content
 		+postList($.WP, "1")
 		div.commentarea
 			div.panestack-title
-				span.title all #{$.WP.Post.NumberOfComments} comments
+				span.title all #{$.WP.NumberOfComments} comments
 			div.menuarea.subtoolbar 
 			form#postComment.usertext.cloneable.warn-on-unload
-				input[type="hidden"][name="thing_id"][value=$.WP.Post.FullID]
+				input[type="hidden"][name="thing_id"][value=$.WP.FullID]
 				div.usertext-edit.md-container
 					div.md
 						textarea[name="text"]

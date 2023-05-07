@@ -1,55 +1,55 @@
 mixin postList($p, $ptt)
-	$likes = likesInt($p.Post.Likes)
+	$likes = likesInt($p.Likes)
 	div
-		[class = "thing link id-"+$p.Post.FullID]
-		.stickied ? $p.Post.Stickied
+		[class = "thing link id-"+$p.FullID]
+		.stickied ? $p.Stickied
 		span.rank
 		+midcol1($likes)
 		if $ptt == "0"
 			div.commentcount
-				a.comments.may-blank[href=$p.Post.Permalink] #{$p.Post.NumberOfComments}
+				a.comments.may-blank[href=$p.Permalink] #{$p.NumberOfComments}
 		div
 			.entry
 			.unvoted ? $likes == 0
 			.likes ? $likes == 1
 			.dislikes ? $likes == -1
-			if $p.HasLinkFlair
-				span.linkflair #{$p.Post.LinkFlairText}
+			if strNotEmpty($p.LinkFlairText)
+				span.linkflair #{$p.LinkFlairText}
 			p.title
-				a.may-blank[href=$p.Post.Permalink] #{$p.Post.Title}
+				a.may-blank[href=$p.Permalink] #{$p.Title}
 				span.domain (self)
 			if $ptt == "0"
-				a.expando-button.collapsed.selftext[href="#"][data-id=$p.Post.FullID]
+				a.expando-button.collapsed.selftext[href="#"][data-id=$p.FullID]
 			div.tagline
 				span
-					span.score.dislikes #{$p.Post.Score - 1} points
-					span.score.unvoted #{$p.Post.Score} points
-					span.score.likes #{$p.Post.Score + 1} points
+					span.score.dislikes #{$p.Score - 1} points
+					span.score.unvoted #{$p.Score} points
+					span.score.likes #{$p.Score + 1} points
 					|&#32;Submitted&#32;
-					time.live-timestamp[title=$p.Post.Created]#{$p.DateAgo}
+					time.live-timestamp[title=$p.Created]#{dateAgo($p.Created)}
 				span
 					|&#32;by&#32;
 					span.flairrichtext.flair
 					a
-						[class=$p.Post.Distinguished] ? strNotEmpty($p.Post.Distinguished)
+						[class=$p.Distinguished] ? strNotEmpty($p.Distinguished)
 						.author
 						.may-blank
-						[href="/u/"+$p.Post.Author]
-						|#{$p.Post.Author}
-				if $p.Post.TotalAwards > 0
-					+awardings($p.Post.Awardings)
-		a.options_link[href="#"][data-id=$p.Post.FullID]
+						[href="/u/"+$p.Author]
+						|#{$p.Author}
+				if $p.TotalAwards > 0
+					+awardings($p.Awardings)
+		a.options_link[href="#"][data-id=$p.FullID]
 		div.expando
 			.toggleable ? $ptt == "0"
 			[style="display:block"] ? $ptt == "1"
 			[style="display:none"] ? $ptt == "0"
-			form.usertext[action=""][method="POST"][data-id=$p.Post.FullID]
-				input[type="hidden"][name="thing_id"][value=$p.Post.FullID]
-				div.usertext-body #{html($p.Post.Selftext_html)}
-				if $p.IsMine
+			form.usertext[action=""][method="POST"][data-id=$p.FullID]
+				input[type="hidden"][name="thing_id"][value=$p.FullID]
+				div.usertext-body #{html($p.Selftext_html)}
+				if isMine($p.Author)
 					div.usertext-edit.md-container[style="display:none"]
 						div.md
-							textarea[name="selftext"] #{$p.Post.Body}
+							textarea[name="selftext"] #{$p.Body}
 							strong
 								span.error.placeholder.field-body
 							div.usertext-buttons
@@ -58,7 +58,7 @@ mixin postList($p, $ptt)
 			a[href="#"][onclick="unimpl()"]
 				div.email-icon
 				|Share
-			if $p.IsMine
-				a[href="#"][data-id=$p.Post.FullID].editButton
+			if isMine($p.Author)
+				a[href="#"][data-id=$p.FullID].editButton
 					div.edit-icon
 					|Edit

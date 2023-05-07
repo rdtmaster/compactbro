@@ -45,18 +45,12 @@ var config CompactConfig
 var server *echo.Echo
 
 type DataWraper[T any] struct {
-	Title string
-	Items []*T
+	PageTitle string
+	Items     []*T
 }
 type PCWrapper struct {
 	DataWraper[reddit.Comment]
-	WP *PostWrapper
-}
-type PostWrapper struct {
-	IsMine       bool
-	HasLinkFlair bool
-	DateAgo      string
-	Post         *reddit.Post
+	WP *reddit.Post
 }
 
 type postEditP struct {
@@ -70,6 +64,10 @@ var client *reddit.Client
 
 func strNotEmpty(s string) bool {
 	return len(s) > 0
+}
+func isMine(author string) bool {
+	return strings.
+		EqualFold(client.Username, author)
 }
 
 func likesInt(l *bool) (likes int) {
@@ -143,7 +141,7 @@ func calcrDate(diff time.Duration) (dVal int, dName string) {
 	}
 	return
 }
-func rDate(t *reddit.Timestamp) string {
+func dateAgo(t *reddit.Timestamp) string {
 	dVal, dName := calcrDate(time.Since(t.Time))
 	switch dVal {
 	case 0:
@@ -152,15 +150,6 @@ func rDate(t *reddit.Timestamp) string {
 		return fmt.Sprintf("%d %s ago", dVal, dName)
 	default:
 		return fmt.Sprintf("%d %ss ago", dVal, dName)
-	}
-}
-func wrapPost(post *reddit.Post) *PostWrapper {
-
-	return &PostWrapper{
-		IsMine:       strings.EqualFold(strings.ToLower(client.Username), strings.ToLower(post.Author)),
-		HasLinkFlair: len(post.LinkFlairText) > 0,
-		Post:         post,
-		DateAgo:      rDate(post.Created),
 	}
 }
 
@@ -181,10 +170,12 @@ func main() {
 		fmt.Println(err)
 		return
 	}
+	amber.FuncMap["isMine"] = isMine
 
 	amber.FuncMap["html"] = func(s string) template.HTML {
 		return template.HTML(html.UnescapeString(s))
 	}
+	amber.FuncMap["dateAgo"] = dateAgo
 	amber.FuncMap["likesInt"] = likesInt
 	amber.FuncMap["strNotEmpty"] = strNotEmpty
 	tpls, err = amber.CompileDir("templates",
@@ -217,11 +208,11 @@ func main() {
 	}
 
 	// Routes
-	server.GET("/stop", shutdown)
-	server.GET("/r/:sub", sub)
-	server.GET("/r/:sub/comments/:id/:permalink", submission)
-	server.POST("/post/edit", editPost)
-	server.POST("/comment", submitComment)
+	server.GET("/stop*", shutdown)
+	server.GET("/r/:sub/", sub)
+	server.GET("/r/:sub/comments/:id/:permalink/", submission)
+	server.POST("/post/edit*", editPost)
+	server.POST("/comment*", submitComment)
 
 	// Start server
 	go func() {
@@ -299,7 +290,7 @@ func processComments(cs []*reddit.Comment) (s string) {
 	<div class="clear options_expando hidden"></div>
 `, entryclass, authorclass, c.Author, userattrs,
 			c.Score-1, c.Score, c.Score+1,
-			rDate(c.Created), c.FullID, html.UnescapeString(c.Body_html))
+			dateAgo(c.Created), c.FullID, html.UnescapeString(c.Body_html))
 		s += fmt.Sprintf(`
 <div class ="thing comment" data-id="%s">
 %s %s
@@ -366,14 +357,9 @@ func sub(c echo.Context) error {
 	}
 	start := time.Now()
 
-	mps := make([]*PostWrapper, len(posts), len(posts))
-	for i, post := range posts {
-		mps[i] = wrapPost(post)
-	}
-
-	pw := DataWraper[PostWrapper]{
-		Title: sr.Title,
-		Items: mps,
+	pw := DataWraper[reddit.Post]{
+		PageTitle: sr.Title,
+		Items:     posts,
 	}
 
 	err = tpls["sub"].Execute(c.Response(), pw)
@@ -401,14 +387,14 @@ func submission(c echo.Context) error {
 	fmt.Println("-------------")
 
 	pw := struct {
-		Title string
-		Items []*reddit.Comment
-		WP    *PostWrapper
-		CBody template.HTML
+		PageTitle string
+		Items     []*reddit.Comment
+		WP        *reddit.Post
+		CBody     template.HTML
 	}{}
-	pw.Title = pc.Post.Title
+	pw.PageTitle = pc.Post.Title
 	pw.Items = pc.Comments
-	pw.WP = wrapPost(pc.Post)
+	pw.WP = pc.Post
 	pw.CBody = t
 
 	err = tpls["post"].Execute(c.Response(), pw)
