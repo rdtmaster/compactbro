@@ -7,13 +7,19 @@ mixin comment($c)
 			.dislikes?$likes == -1
 			.unvoted?$likes == 0
 			.likes?$likes == 1
+				$attrs = getDistinguished($c.Distinguished,$c.IsSubmitter)
 				div.tagline
-					a.author.may-blank[href="/u/"+$c.Author]#{$c.Author}
-					span.userattrs
-					|&nbsp;
-					span.score.dislikes #{$c.Score - 1} points
-					span.score.unvoted #{$c.Score} points
-					span.score.likes #{$c.Score + 1} points
+					a
+						[class=$attrs.Class]
+						.author
+						.may-blank
+						[href="/u/"+$c.Author]
+						#{$c.Author}
+					if strNotEmpty($attrs.Letters)
+						span.userattrs#{html($attrs.Letters)}
+					span.score.dislikes#{$c.Score} points
+					span.score.unvoted#{$c.Score} points
+					span.score.likes#{$c.Score} points
 					|#{dateAgo($c.Created)}
 			a.options_link
 			form.usertext[action="#"]

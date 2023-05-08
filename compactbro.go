@@ -70,20 +70,57 @@ func strNotEmpty(s string) bool {
 func hasReplies(comment *reddit.Comment) bool {
 	return len(comment.Replies.Comments) > 0
 }
-func processReplies(comments reddit.Replies) string {
 
-	fmt.Println("----------")
-	fmt.Println("in proc replies")
-	fmt.Println("----------")
+type userAttr struct {
+	Class   string
+	Letters string
+}
+
+var emptyAttrs = userAttr{"", ""}
+
+func getDistinguished(distinguished string, isSubmitter bool) userAttr {
+	if !isSubmitter && len(distinguished) == 0 {
+		return emptyAttrs
+	}
+	class := distinguished
+	if isSubmitter {
+		if len(class) == 0 {
+			class = "submitter"
+		} else {
+			class += " submitter"
+		}
+	}
+	ln := strings.Count(class, " ") + 1
+
+	tmp := make([]string, ln)
+	i := 0
+	if strings.Contains(class, "moderator") {
+		tmp[i] = "<a href=\"#\" class=\"moderator\" title=\"moderator of this subreddit, speaking officially\">M</a>"
+		i++
+	}
+	if strings.Contains(class, "admin") {
+		tmp[i] = "<a href=\"#\" class=\"admin\" title=\"Reddit Administrator\">A</a>"
+		i++
+	}
+	if strings.Contains(class, "submitter") {
+		tmp[i] = "<a href=\"#\" class=\"submitter\" title=\"submitter\">S</a>"
+		i++
+	}
+	return userAttr{
+		Class:   class,
+		Letters: "[" + strings.Join(tmp, ",") + "]",
+	}
+
+}
+func processReplies(replies reddit.Replies) string {
+
 	var buf bytes.Buffer
-	err := tpls["childComments"].Execute(&buf, comments)
+	err := tpls["childComments"].Execute(&buf, replies)
 	if err != nil {
 		fmt.Println("Error! ", err.Error())
 		return err.Error()
 	}
-	fmt.Println("----------")
-	fmt.Println(buf.String())
-	fmt.Println("----------")
+
 	return buf.String()
 }
 func isMine(author string) bool {
@@ -191,6 +228,7 @@ func main() {
 		fmt.Println(err)
 		return
 	}
+	amber.FuncMap["getDistinguished"] = getDistinguished
 	amber.FuncMap["isMine"] = isMine
 
 	amber.FuncMap["html"] = func(s string) template.HTML {
@@ -274,61 +312,6 @@ func indent(n int, s string) (res string) {
 	return
 }
 
-func processComments(cs []*reddit.Comment) (s string) {
-
-	for _, c := range cs {
-		entryclass := "unvoted"
-		upclass := "arrow up login-required "
-		downclass := "arrow down login-required"
-		if c.Likes != nil {
-			if *(c.Likes) == true {
-				entryclass = "likes"
-				upclass += " upmod"
-
-			} else {
-				entryclass = "dislikes"
-				downclass += " downmod"
-			}
-		}
-
-		midcol := fmt.Sprintf(`	<div class="midcol"><div class="%s"></div><div class="%s"></div></div>
-`, upclass, downclass)
-		authorclass := "author may-blank id-" + c.FullID
-		userattrs := ""
-		if c.IsSubmitter {
-			userattrs = "[<a class=\"submitter\" title=\"submitter\" href=\"#\">S</a>]"
-			authorclass += " submitter"
-		}
-		entry := fmt.Sprintf(`	<div class="entry %s">
-		<div class="tagline">
-			<a class="%s" href="/u/%[3]s">%[3]s</a>
-			<span class="userattrs">%s</span> <span class="score dislikes">%d points</span><span class="score unvoted">%d points</span><span class="score likes">%d points</span>  %s
-		</div>
-	</div>
-	<a href="" class="options_link"></a>
-	<form action="#" class="usertext">
-		<input name="thing_id" type="hidden" value="%s"/>
-		<div class="usertext-body">%s</div>
-	</form>
-	<div class="clear options_expando hidden"></div>
-`, entryclass, authorclass, c.Author, userattrs,
-			c.Score-1, c.Score, c.Score+1,
-			dateAgo(c.Created), c.FullID, html.UnescapeString(c.Body_html))
-		s += fmt.Sprintf(`
-<div class ="thing comment" data-id="%s">
-%s %s
-<div class="commentspacer"></div>
-
-`, c.FullID, midcol, entry)
-
-		if len(c.Replies.Comments) > 0 {
-			s += "<div class=\"child\">" + processComments(c.Replies.Comments) + "</div>"
-		}
-		s += "</div>"
-	}
-	return
-}
-
 type commentSubmP struct {
 	Thing_id string `json:"thing_id"`
 	Text     string `json:"text"`
@@ -341,12 +324,15 @@ func submitComment(c echo.Context) error {
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, err)
 	}
-	comment, resp, err := client.Comment.Submit(c.Request().Context(), co.Thing_id, co.Text)
+	comment, _, err := client.Comment.Submit(c.Request().Context(), co.Thing_id, co.Text)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, err)
 	}
+	type commentWrapper struct {
+		Comment *reddit.Comment
+	}
+	return tpls["oneComment"].Execute(c.Response(), commentWrapper{comment})
 
-	return c.HTML(resp.StatusCode, processComments([]*reddit.Comment{comment}))
 }
 
 // Edit post
@@ -401,8 +387,9 @@ func sub(c echo.Context) error {
 
 // View post
 func submission(c echo.Context) error {
-	start := time.Now()
+
 	pc, _, err := client.Post.Get(c.Request().Context(), c.Param("id"))
+	start := time.Now()
 	if err != nil {
 		return c.String(http.StatusInternalServerError, err.Error())
 	}
@@ -414,37 +401,6 @@ func submission(c echo.Context) error {
 	pw.PageTitle = pc.Post.Title
 	pw.Items = pc.Comments
 	pw.WP = pc.Post
-
-	err = tpls["post"].Execute(c.Response(), pw)
-
-	elapsed := time.Since(start)
-	fmt.Println("--------")
-	fmt.Printf("comments rendered in %s", elapsed)
-	fmt.Println()
-	fmt.Println("--------")
-
-	return err
-}
-
-func submission2(c echo.Context) error {
-	start := time.Now()
-	pc, _, err := client.Post.Get(c.Request().Context(), c.Param("id"))
-
-	t := template.HTML(processComments(pc.Comments))
-	fmt.Println("-------------")
-	fmt.Println(t)
-	fmt.Println("-------------")
-
-	pw := struct {
-		PageTitle string
-		Items     []*reddit.Comment
-		WP        *reddit.Post
-		CBody     template.HTML
-	}{}
-	pw.PageTitle = pc.Post.Title
-	pw.Items = pc.Comments
-	pw.WP = pc.Post
-	pw.CBody = t
 
 	err = tpls["post"].Execute(c.Response(), pw)
 
