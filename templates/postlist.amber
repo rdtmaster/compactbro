@@ -19,7 +19,7 @@ mixin postList($p, $ptt)
 				a.may-blank[href=$p.Permalink] #{$p.Title}
 				span.domain (self)
 			if $ptt == "0"
-				a.expando-button.collapsed.selftext[href="#"][data-id=$p.FullID]
+				a.expando-button.collapsed.selftext[href="#"][onclick="return postBodyDisplay(this)"]
 			div.tagline
 				span
 					span.score.dislikes #{$p.Score - 1} points
@@ -40,25 +40,22 @@ mixin postList($p, $ptt)
 					+awardings($p.Awardings)
 		a.options_link[href="#"][data-id=$p.FullID]
 		div.expando
-			.toggleable ? $ptt == "0"
-			[style="display:block"] ? $ptt == "1"
-			[style="display:none"] ? $ptt == "0"
+			.hidden?$ptt == "0"
 			form.usertext[action=""][method="POST"][data-id=$p.FullID]
 				input[type="hidden"][name="thing_id"][value=$p.FullID]
-				div.usertext-body #{html($p.Selftext_html)}
+				div.usertext-body#{html($p.Selftext_html)}
 				if isMine($p.Author)
-					div.usertext-edit.md-container[style="display:none"]
-						div.md
-							textarea[name="selftext"] #{$p.Body}
-							strong
-								span.error.placeholder.field-body
-							div.usertext-buttons
-								button.save.newbutton[type="submit"] Save
-		div.clear.options_expando[style="display:none"]
+					div.md.usertext-edit.hidden
+						textarea[name="selftext"]#{unescaped($p.Body)}
+						strong
+							span.error.placeholder.field-body
+						div.usertext-buttons
+							button.save.newbutton[type="submit"] Save
+		div.clear.options_expando.hidden
 			a[href="#"][onclick="unimpl()"]
 				div.email-icon
 				|Share
 			if isMine($p.Author)
-				a[href="#"][data-id=$p.FullID].editButton
+				a[href="#"][onclick="return editDisplay(this)"].editButton
 					div.edit-icon
 					|Edit

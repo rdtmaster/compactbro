@@ -24,8 +24,40 @@ mixin comment($c)
 			a.options_link
 			form.usertext[action="#"]
 				input[name="thing_id"][value=$c.FullID][type="hidden"]
-				div.usertext-body #{html($c.Body_html)}
-			div.clear.options_expando.hidden
+				div.usertext-body#{html($c.Body_html)}
+					if isMine($c.Author)
+						div.usertext-edit.hidden
+							textarea[name="selftext"]#{unescaped($c.Body)}
+							div.bottom-area
+								strong
+									span.error.placeholder.field-body
+								div.usertext-buttons
+									button.save.newbutton[type="submit"] Save
+									button.newbutton[type="submit"] Delete comment
+							div[style="clear:both"]
+			div.clear.options_expando.hidden[style="display:block"]
+				a[href="#"][onclick="return unimpl()"]
+					div.email-icon
+					|Share
+				a[href="#"][onclick="return replyFormDisplay(this)"]
+					div.reply-icon
+					|Reply
+				if isMine($c.Author)
+					a[href="#"][onclick="return editFormDisplay(this)"]
+						div.edit-icon
+						|Edit
+		div.child.commentreply.hidden
+				form.usertext[action="#"]
+					input[name="thing_id"][value=$c.FullID][type="hidden"]
+					div.usertext-edit.md-container
+						div.md
+							textarea[name="text"]
+						div.bottom-area
+							strong
+								span.error.hidden
+							div.usertext-buttons
+								button.save.newbutton[type="submit"] Save
+							div[style="clear:both"]
 		div.commentspacer
 		if hasReplies($c)
 			div.child #{html(processReplies($c.Replies))}
