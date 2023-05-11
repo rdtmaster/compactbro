@@ -51,6 +51,15 @@ LineNumbers = true
 ```
 replace values in `<...>` with relevant data, do not include `<` and `>`
 
+Before describing the config process, let's summarize it to help you decide what you need and don't need depending on your goals.
+
+1. **Running `compactbro` locally, without replacing `i.reddit.com`**. No HTTPs and no Authentication
+2. **Running `compactbro` locally, replacing `i.reddit.com`**. No authentication, HTTPS enabled
+3. **Running `compactbro` on a remote server without replacing `i.reddit.com`**. Auth and optional (but recommended) HTTPS
+4. **Running `compactbro` on a remote server, replacing `i.reddit.com`**. Authentication+HTTPS.
+
+Read further to know what do these steps mean and, when you decide what kind of setup you want, this list will help you realize which steps are required.
+
 ### Auth
 Generally there are two strategies of using compactbro: run it locally or on a server. If the former, you don't need any authentication whatsoever, simply fire it up; but running it on a remote server can provide several advantages, namely you don't need to have any additional process launched on your device. A low-end Linux VPS server should suffice and, once you configure Authentication and HTTPS, you can make it a drop-in replacement for `i.reddit.com`.
 You should take into account that without authentication compactbro exposes its interface on `IP:port` specified in the config file. Be careful when choosing the listen address. If you specify `127.0.0.1` it is available only within the realm of your machine; if it is a local address like `192.168.5.5` (or another range used in your LAN) it can be accessed by other users in the same network. And if you choose your WAN IP or use `0.0.0.0`  it becomes available to the whole world (provided you have a direct none-NAT internet connection). The latter option is meant for running the app server-side.
