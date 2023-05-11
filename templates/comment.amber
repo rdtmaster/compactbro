@@ -10,7 +10,9 @@ mixin comment($c)
 				$attrs = getDistinguished($c.Distinguished,$c.IsSubmitter)
 				div.tagline
 					a
-						[class=$attrs.Class]
+						.submitter?$attrs.Submitter
+						.moderator?$attrs.Moderator
+						.admin?$attrs.Admin
 						.author
 						.may-blank
 						[href="/u/"+$c.Author]
@@ -56,16 +58,15 @@ mixin comment($c)
 						div.edit-icon
 						|Edit
 		div.child.commentreply.hidden
-				form.usertext[action="#"]
-					input[name="thing_id"][value=$c.FullID][type="hidden"]
-					div.usertext-edit.md-container
-						div.md
-							textarea[name="text"]
+				div.thing.comment
+					form.usertext[action="#"]
+						input[name="thing_id"][value=$c.FullID][type="hidden"]
+						textarea[name="text"][cols=1][rows=1]
 						div.bottom-area
 							strong
 								span.error.hidden
 							div.usertext-buttons
-								button.save.newbutton[type="submit"] Save
+								button.save.newbutton[type="submit"] Reply
 							div[style="clear:both"]
 		div.commentspacer
 		if hasReplies($c)

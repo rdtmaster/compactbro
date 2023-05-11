@@ -2,6 +2,7 @@ package main
 
 import (
 	"bytes"
+	"context"
 	"fmt"
 	"html"
 	"html/template"
@@ -23,6 +24,15 @@ import (
 	"github.com/rdtmaster/go-reddit/v3/reddit"
 )
 
+type commentSubmP struct {
+	Thing_id string `json:"thing_id"`
+	Text     string `json:"text"`
+}
+
+type voteResult struct {
+	Direction string `json:"direction"`
+	Thing_id  string `json:"thing_id"`
+}
 type CompactConfig struct {
 	EcoMode      bool
 	LocalAddress string
@@ -71,46 +81,50 @@ func hasReplies(comment *reddit.Comment) bool {
 	return len(comment.Replies.Comments) > 0
 }
 
-type userAttr struct {
-	Class   string
-	Letters string
+type userAttrs struct {
+	Submitter bool
+	Moderator bool
+	Admin     bool
+	Letters   string
 }
 
-var emptyAttrs = userAttr{"", ""}
-
-func getDistinguished(distinguished string, isSubmitter bool) userAttr {
-	if !isSubmitter && len(distinguished) == 0 {
-		return emptyAttrs
-	}
-	class := distinguished
-	if isSubmitter {
-		if len(class) == 0 {
-			class = "submitter"
-		} else {
-			class += " submitter"
+func numTrues(bs ...bool) (n int) {
+	n = 0
+	for _, b := range bs {
+		if b {
+			n++
 		}
 	}
-	ln := strings.Count(class, " ") + 1
+	return
+}
+func getDistinguished(distinguished string, isSubmitter bool) (ua userAttrs) {
 
+	ua = userAttrs{
+		Submitter: isSubmitter,
+		Moderator: strings.Contains(distinguished, "moderator"),
+		Admin:     strings.Contains(distinguished, "admin"),
+	}
+	ln := numTrues(ua.Moderator, ua.Admin, ua.Submitter)
+	if ln == 0 {
+		ua.Letters = ""
+		return
+	}
 	tmp := make([]string, ln)
 	i := 0
-	if strings.Contains(class, "moderator") {
+	if ua.Moderator {
 		tmp[i] = "<a href=\"#\" class=\"moderator\" title=\"moderator of this subreddit, speaking officially\">M</a>"
 		i++
 	}
-	if strings.Contains(class, "admin") {
+	if ua.Admin {
 		tmp[i] = "<a href=\"#\" class=\"admin\" title=\"Reddit Administrator\">A</a>"
 		i++
 	}
-	if strings.Contains(class, "submitter") {
+	if ua.Submitter {
 		tmp[i] = "<a href=\"#\" class=\"submitter\" title=\"submitter\">S</a>"
 		i++
 	}
-	return userAttr{
-		Class:   class,
-		Letters: "[" + strings.Join(tmp, ",") + "]",
-	}
-
+	ua.Letters = "[" + strings.Join(tmp, ",") + "]"
+	return
 }
 func processReplies(replies reddit.Replies) string {
 
@@ -156,7 +170,6 @@ func roundTime(input float64) int {
 }
 
 func calcrDate(diff time.Duration) (dVal int, dName string) {
-
 	dName = ""
 	dVal = 0
 	secs := diff.Seconds()
@@ -274,6 +287,7 @@ func main() {
 	server.GET("/r/:sub/comments/:id/:permalink/", submission)
 	server.POST("/post/edit*", editPost)
 	server.POST("/comment*", submitComment)
+	server.GET("/vote/:direction/:thing_id/", vote)
 
 	// Start server
 	go func() {
@@ -312,9 +326,32 @@ func indent(n int, s string) (res string) {
 	return
 }
 
-type commentSubmP struct {
-	Thing_id string `json:"thing_id"`
-	Text     string `json:"text"`
+// up/down/remove-vote for post/coment
+// /vote/{up|down|remove}/<thing_id>/
+func vote(c echo.Context) error {
+	fmt.Println("-----------")
+	fmt.Println("Voting")
+	fmt.Println("-----------")
+	direction := c.Param("direction")
+	thing_id := c.Param("thing_id")
+
+	var f func(ctx context.Context, id string) (*reddit.Response, error)
+	f = client.Post.Upvote
+	switch direction {
+	case "up":
+		f = client.Post.Upvote
+	case "down":
+		f = client.Post.Downvote
+	default:
+		f = client.Post.RemoveVote
+	}
+	resp, err := f(c.Request().Context(), thing_id)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, err)
+	}
+	return c.JSON(resp.StatusCode,
+		voteResult{Direction: direction, Thing_id: thing_id})
+
 }
 
 // Submit comment
@@ -324,6 +361,7 @@ func submitComment(c echo.Context) error {
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, err)
 	}
+
 	comment, _, err := client.Comment.Submit(c.Request().Context(), co.Thing_id, co.Text)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, err)
