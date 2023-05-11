@@ -21,7 +21,7 @@ mixin comment($c)
 					span.score.unvoted#{$c.Score} points
 					span.score.likes#{$c.Score} points
 					|#{dateAgo($c.Created)}
-			a.options_link
+			a.options_link[href="#"][onclick="return optionsDisplay(this)"]
 			form.usertext[action="#"]
 				input[name="thing_id"][value=$c.FullID][type="hidden"]
 				div.usertext-body#{html($c.Body_html)}
@@ -35,7 +35,7 @@ mixin comment($c)
 									button.save.newbutton[type="submit"] Save
 									button.newbutton[type="submit"] Delete comment
 							div[style="clear:both"]
-			div.clear.options_expando.hidden[style="display:block"]
+			div.clear.options_expando.hidden
 				a[href="#"][onclick="return unimpl()"]
 					div.email-icon
 					|Share
@@ -43,6 +43,15 @@ mixin comment($c)
 					div.reply-icon
 					|Reply
 				if isMine($c.Author)
+					a[href="#"][onclick="unimpl()"]
+						div.context-icon
+						|Context
+					a[href="#"][onclick="unimpl()"]
+						div.permalink-icon
+						|Permalink
+					a[href="#"][onclick="unimpl()"]
+						div.collapse-icon
+						|Collapse
 					a[href="#"][onclick="return editFormDisplay(this)"]
 						div.edit-icon
 						|Edit

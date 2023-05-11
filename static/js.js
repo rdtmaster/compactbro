@@ -30,11 +30,6 @@ function pst(url,json){
 	});
 }
 
-function optionsDisplay(thingId){
-	const subm = document.getElementsByClassName('id-'+thingId)[0];
-	togDisplay(subm.getElementsByClassName('options_expando')[0]);
-			
-}
 function isHidden(elem){
 	return elem.classList.contains('hidden');
 }
@@ -42,6 +37,12 @@ function isHidden(elem){
 function isShown(elem){
 	return !isHidden(elem);
 }
+
+function optionsDisplay(that){
+	togDisplay(that.parentNode.getElementsByClassName('options_expando')[0]);
+	return false;
+}
+
 function editDisplay(that){
 	const thing = that.parentNode.parentNode;
 	const expando = thing.getElementsByClassName('expando')[0];
@@ -155,21 +156,6 @@ function submitComment(pf){
 		});
 }
 function docOnLoad(){
-	const expandoButtons = document.getElementsByClassName('expando-button');
-	
-	
-	const optionButtons = document.getElementsByClassName('options_link');
-	
-	for (let i = 0;i < optionButtons.length;i++){
-		const b = optionButtons[i];
-		const id = b.dataset.id;
-		b.addEventListener("click",e => {
-			e.preventDefault();
-			optionsDisplay(id);
-		});
-	}
-	
-
 	
 	const links = document.getElementsByClassName('link');
 	for (link of links){

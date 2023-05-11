@@ -38,7 +38,7 @@ mixin postList($p, $ptt)
 						|#{$p.Author}
 				if $p.TotalAwards > 0
 					+awardings($p.Awardings)
-		a.options_link[href="#"][data-id=$p.FullID]
+		a.options_link[href="#"][onclick="return optionsDisplay(this)"]
 		div.expando
 			.hidden?$ptt == "0"
 			form.usertext[action=""][method="POST"][data-id=$p.FullID]
