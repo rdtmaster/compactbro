@@ -1,7 +1,7 @@
 # CompactBro
 ## what it is?
 A reddit client for web that focuses on fast load time, old browser compatability and delivering user experience similar or at least reasonably close to that provided by i.reddit.com mobile interface, also known as `.compact`.
-
+ 
 ## Why?
 In late march 2023 the mobile web interface got removed by reddit staff.
 
