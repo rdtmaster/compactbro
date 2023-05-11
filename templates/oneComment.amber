@@ -1,4 +1,5 @@
 import awardings
 import comment
 import midcol
+import score
 +comment($.Comment)

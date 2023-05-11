@@ -1,6 +1,7 @@
 extends header
 block content
 	import awardings
+	import score
 	div#siteTable.sitetable.linklisting
 		import midcol
 		import postlist

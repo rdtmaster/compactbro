@@ -1,0 +1,4 @@
+mixin score($n)
+	span.score.dislikes#{$n-1} points
+	span.score.unvoted#{$n} points
+	span.score.likes#{$n+1} points

@@ -1,8 +1,10 @@
 mixin postList($p, $ptt)
 	$likes = likesInt($p.Likes)
 	div
-		[class = "thing link id-"+$p.FullID]
+		.thing
+		.link
 		.stickied ? $p.Stickied
+		[data-id=$p.FullID]
 		span.rank
 		+midcol1($likes)
 		if $ptt == "0"
@@ -22,9 +24,7 @@ mixin postList($p, $ptt)
 				a.expando-button.collapsed.selftext[href="#"][onclick="return postBodyDisplay(this)"]
 			div.tagline
 				span
-					span.score.dislikes #{$p.Score - 1} points
-					span.score.unvoted #{$p.Score} points
-					span.score.likes #{$p.Score + 1} points
+					+score($p.Score)
 					|&#32;Submitted&#32;
 					time.live-timestamp[title=$p.Created]#{dateAgo($p.Created)}
 				span
@@ -41,7 +41,7 @@ mixin postList($p, $ptt)
 		a.options_link[href="#"][onclick="return optionsDisplay(this)"]
 		div.expando
 			.hidden?$ptt == "0"
-			form.usertext[action=""][method="POST"][data-id=$p.FullID]
+			form.usertext[action=""][method="POST"][onsubmit="return editSubmit(this)"]
 				input[type="hidden"][name="thing_id"][value=$p.FullID]
 				div.usertext-body#{html($p.Selftext_html)}
 				if isMine($p.Author)

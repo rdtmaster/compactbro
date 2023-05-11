@@ -1,4 +1,4 @@
-const baseURL=''; //same domain
+const baseURL = ''; //same domain
 function unimpl(){
 	alert('Unimplemented!!!');
 	return false;
@@ -16,6 +16,10 @@ function togDisplay(elem){
 	} else {
 		hide(elem);
 	}
+}
+
+function get(url){
+	return fetch(baseURL+url, {method: 'GET'});
 }
 
 function pst(url,json){
@@ -115,23 +119,28 @@ function showErrors(status, errors, errDisplay){
 		errDisplay.innerHTML = s;
 }
 
-function userTextSubm(uf){
+function editSubmit(uf){
 	
 	const json = form2json(uf);
 	const errDisplay = uf.getElementsByClassName('error')[0];
 	errDisplay.textContent ='Loading...';
-	pst('/post/edit',json)
+	pst('/edit/',json)
 		.then(r => r.json().then(j =>{
 			if (r.status === 200) {
 				errDisplay.textContent ='';
-				uf.getElementsByClassName('md')[0].innerHTML = j.selftext_html;
-				const entry = uf.parentNode.parentNode;
-				hide(entry.getElementsByClassName('md-container')[0]);
+				const tcl = uf.parentNode.parentNode.classList;
+				console.log(j);
+					uf.getElementsByClassName('usertext-body')[0].innerHTML = j.body;
+				
+				hide(uf.getElementsByClassName('usertext-edit')[0]);
+				show(uf.getElementsByClassName('usertext-body')[0]);
 				
 			} else {
 				showErrors(r.status, j.json.errors, errDisplay)
 			}
 		}));
+		
+		return false;
 }
 
 function submitComment(pf){
@@ -155,19 +164,56 @@ function submitComment(pf){
 			}
 		});
 }
+
+function vote(that){
+	const cl = that.classList
+	const midcol = that.parentNode;
+	const thing = midcol.parentNode;
+	var direction = '';
+	if (cl.contains('downmod') || cl.contains('upmod')){
+		direction ="remove";
+	} else if (cl.contains('up')){
+		direction = 'up';
+	} else if (cl.contains('down')){
+		direction = 'down';
+	}
+	get('/vote/'+direction+'/'+thing.dataset.id+'/').then(r => {
+		if (r.status === 200){
+			const arrows = midcol.getElementsByClassName('arrow');
+			const ecl = thing.getElementsByClassName('entry')[0].classList;
+			switch(direction){
+				case 'remove':
+					ecl.remove('likes');
+					ecl.remove('dislikes');
+					ecl.add('unvoted');
+					arrows[0].classList.remove('upmod');
+					arrows[1].classList.remove('downmod');
+					break;
+				case 'up':
+					ecl.remove('dislikes');
+					ecl.remove('unvoted');
+					ecl.add('likes');
+					arrows[0].classList.add('upmod');
+					arrows[1].classList.remove('downmod');
+					break;
+				case 'down':
+					ecl.remove('unvoted');
+					ecl.remove('likes');
+					ecl.add('dislikes');
+					arrows[0].classList.remove('upmod');
+					arrows[1].classList.add('downmod');
+					break;
+			}
+		} else {
+			alert('Voting error '+r.status);
+		}
+	});
+	return false;
+}
 function docOnLoad(){
 	
 	const links = document.getElementsByClassName('link');
-	for (link of links){
-		
-		const uf = link.getElementsByClassName('usertext')[0];
-		uf.addEventListener("submit",e => {
-			e.preventDefault();
-			userTextSubm(uf);
-			
-		});
 	
-	}
 	
 	const postCommentForm = document.getElementById('postComment');
 	if (postCommentForm){

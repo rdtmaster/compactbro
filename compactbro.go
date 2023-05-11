@@ -24,6 +24,11 @@ import (
 	"github.com/rdtmaster/go-reddit/v3/reddit"
 )
 
+const (
+	kindComment = "t1"
+	kindPost    = "t3"
+)
+
 type commentSubmP struct {
 	Thing_id string `json:"thing_id"`
 	Text     string `json:"text"`
@@ -64,9 +69,12 @@ type PCWrapper struct {
 	WP *reddit.Post
 }
 
-type postEditP struct {
+type editP struct {
 	Thing_id string `json:"thing_id"`
 	Selftext string `json:"selftext"`
+}
+type editResult struct {
+	Body string `json:"body"`
 }
 
 var tpls map[string]*template.Template
@@ -285,7 +293,7 @@ func main() {
 	server.GET("/stop*", shutdown)
 	server.GET("/r/:sub/", sub)
 	server.GET("/r/:sub/comments/:id/:permalink/", submission)
-	server.POST("/post/edit*", editPost)
+	server.POST("/edit/", editThing)
 	server.POST("/comment*", submitComment)
 	server.GET("/vote/:direction/:thing_id/", vote)
 
@@ -374,20 +382,29 @@ func submitComment(c echo.Context) error {
 }
 
 // Edit post
-func editPost(c echo.Context) error {
-	var p postEditP
+func editThing(c echo.Context) error {
+	var p editP
 	err := c.Bind(&p)
 
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, err)
 	}
-
-	post, resp, err := client.Post.Edit(c.Request().Context(), p.Thing_id, p.Selftext)
-	if err != nil {
-		return c.JSON(http.StatusInternalServerError, err)
+	var r editResult
+	if strings.HasPrefix(p.Thing_id, kindPost) {
+		post, _, err := client.Post.Edit(c.Request().Context(), p.Thing_id, p.Selftext)
+		if err != nil {
+			return c.JSON(http.StatusInternalServerError, err)
+		}
+		r = editResult{post.Selftext_html}
+	} else if strings.HasPrefix(p.Thing_id, kindComment) {
+		comment, _, err := client.Comment.Edit(c.Request().Context(), p.Thing_id, p.Selftext)
+		if err != nil {
+			return c.JSON(http.StatusInternalServerError, err)
+		}
+		r = editResult{comment.Body_html}
 	}
-	return c.JSON(resp.StatusCode, post)
 
+	return c.JSON(http.StatusOK, r)
 }
 
 // sub
