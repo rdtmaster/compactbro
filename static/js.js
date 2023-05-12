@@ -17,9 +17,18 @@ function togDisplay(elem){
 		hide(elem);
 	}
 }
+function togTopMenu(){
+	togDisplay(document.getElementById('top_menu'));
+	return false;
+}
+
 function backgroundUnread(){
 	fetch(baseURL+'/checkunread/', {method: 'HEAD'}).then(r =>{
-		console.log(r.status);
+		if (r.status === 200){
+			const mailcl = document.getElementById('mail').classList;
+			mailcl.remove('nohavemail');
+			mailcl.add('havemail');
+		}
 	});
 }
 
