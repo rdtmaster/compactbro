@@ -10,20 +10,12 @@ mixin comment($c)
 			.dislikes?$likes == -1
 			.unvoted?$likes == 0
 			.likes?$likes == 1
-				$attrs = getDistinguished($c.Distinguished,$c.IsSubmitter)
 				div.tagline
-					a
-						.author
-						.may-blank
-						.submitter?$attrs.Submitter
-						.moderator?$attrs.Moderator
-						.admin?$attrs.Admin
-						[href="/u/"+$c.Author]
-						#{$c.Author}
-					if strNotEmpty($attrs.Letters)
-						span.userattrs#{html($attrs.Letters)}
+					+author($c.Author, getDistinguished($c.Distinguished,$c.IsSubmitter))
 					+score($c.Score)
-					|#{dateAgo($c.Created)}
+					span.live-timestamp[title=$c.Created]#{dateAgo($c.Created)}
+					if $c.TotalAwards > 0
+						+awardings($c.Awardings)
 			a.options_link[href="#"][onclick="return optionsDisplay(this)"]
 			form.usertext[action="#"][method="POST"][onsubmit="return editSubmit(this)"]
 				input[name="thing_id"][value=$c.FullID][type="hidden"]

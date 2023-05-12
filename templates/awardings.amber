@@ -4,7 +4,7 @@ mixin awardings($aws)
 			a
 				.awarding-link
 				[href="#"]
-				[title=$a.Description]
+				[title=$a.Name+" : "+$a.Description]
 					span.awarding-icon-container
 						img
 							.awarding-icon

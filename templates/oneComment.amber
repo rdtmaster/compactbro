@@ -2,4 +2,6 @@ import awardings
 import comment
 import midcol
 import score
+import author
+import awardings
 +comment($.Comment)

@@ -5,5 +5,6 @@ block content
 		import midcol
 		import awardings
 		import score
+		import author
 		each $post in Items
 			+postList($post, "0")

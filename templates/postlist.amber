@@ -37,12 +37,7 @@ mixin postList($p, $ptt)
 				span
 					|&#32;by&#32;
 					span.flairrichtext.flair
-					a
-						[class=$p.Distinguished] ? strNotEmpty($p.Distinguished)
-						.author
-						.may-blank
-						[href="/u/"+$p.Author]
-						|#{$p.Author}
+					+author($p.Author, getDistinguished($p.Distinguished,(2==1)))
 				if $p.TotalAwards > 0
 					+awardings($p.Awardings)
 		a.options_link[href="#"][onclick="return optionsDisplay(this)"]
