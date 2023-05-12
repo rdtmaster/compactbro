@@ -302,7 +302,10 @@ func main() {
 
 	// Routes
 	server.GET("/stop*", shutdown)
-	server.GET("/r/:sub/", sub)
+	server.GET("/r/:sub", subDefault)
+	server.GET("/r/:sub/", subDefault)
+	server.GET("/r/:sub/:sorting", subDisplay)
+	server.GET("/r/:sub/:sorting/", subDisplay)
 	server.GET("/r/:sub/comments/:id/:permalink/", submission)
 	server.POST("/edit/", editThing)
 	server.POST("/comment*", submitComment)
@@ -324,7 +327,6 @@ func main() {
 
 		}
 	}
-	//server.Logger.Fatal(server.Start(config.LocalAddress))
 
 }
 
@@ -425,23 +427,46 @@ func editThing(c echo.Context) error {
 	return c.JSON(http.StatusOK, r)
 }
 
-// sub
-func sub(c echo.Context) error {
+func subSorted(c echo.Context, sorting string) error {
+	var pageTitle string
+	var f func(context.Context, string, *reddit.ListOptions) ([]*reddit.Post, *reddit.Response, error)
+	switch strings.ToLower(sorting) {
+	case "new":
+		f = client.Subreddit.NewPosts
+	case "hot":
+		f = client.Subreddit.HotPosts
+	case "rising":
+		f = client.Subreddit.RisingPosts
+	case "controversial":
+		f = client.Subreddit.ControversialPosts
+	case "top":
+		f = client.Subreddit.TopPosts
+	default:
+		f = client.Subreddit.HotPosts
+	}
+	posts, _, err := f(c.Request().Context(), c.Param("sub"), nil)
 
-	sr, _, err := client.Subreddit.Get(c.Request().Context(), c.Param("sub"))
 	if err != nil {
 		return c.String(http.StatusInternalServerError, err.Error())
 	}
-
-	posts, _, err := client.Subreddit.HotPosts(c.Request().Context(), c.Param("sub"), nil)
-
-	if err != nil {
-		return c.String(http.StatusInternalServerError, err.Error())
+	if !config.EcoMode {
+		sr, _, err := client.Subreddit.Get(c.Request().Context(), c.Param("sub"))
+		if err != nil {
+			return c.String(http.StatusInternalServerError, err.Error())
+		}
+		pageTitle = sr.Title
+	} else {
+		if len(posts) > 0 {
+			pageTitle = posts[0].SubredditNamePrefixed
+		} else {
+			pageTitle = "/r/" + c.Param("sub")
+		}
 	}
+
 	start := time.Now()
 
 	pw := DataWraper[reddit.Post]{
-		PageTitle: sr.Title,
+		PageTitle: pageTitle,
 		Items:     posts,
 	}
 
@@ -456,7 +481,14 @@ func sub(c echo.Context) error {
 	fmt.Println()
 	fmt.Println("--------")
 	return err
+}
 
+// sub
+func subDefault(c echo.Context) error {
+	return subSorted(c, "hot")
+}
+func subDisplay(c echo.Context) error {
+	return subSorted(c, c.Param("sorting"))
 }
 
 // View post
