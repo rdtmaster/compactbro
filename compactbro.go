@@ -57,6 +57,7 @@ type CompactConfig struct {
 	TemplateOptions amber.Options
 }
 
+var oneItem = &reddit.ListOptions{Limit: 1}
 var config CompactConfig
 var server *echo.Echo
 
@@ -276,8 +277,8 @@ func main() {
 	}
 	server = echo.New()
 	server.Static("/static", "static")
+	server.File("/favicon.ico", "static/favicon.ico")
 
-	// Middleware
 	if config.Logging {
 		server.Use(middleware.Logger())
 	}
@@ -297,6 +298,7 @@ func main() {
 	server.POST("/comment*", submitComment)
 	server.GET("/vote/:direction/:thing_id/", vote)
 
+	server.HEAD("/checkunread/", checkUnread)
 	// Start server
 	go func() {
 		if err := server.Start(config.LocalAddress); err != http.ErrServerClosed {
@@ -325,13 +327,19 @@ func shutdown(c echo.Context) error {
 	}()
 	return c.HTML(200, `<html><head><title>Goodbye</title><body bgcolor="#000123" text="#cdedfe"><h1 style="font-family: tahoma;right: 50%;bottom: 50%;transform: translate(50%,50%);position: absolute">Stopping server...</h1></body></html>`)
 }
-func indent(n int, s string) (res string) {
-	spaces := "\n"
-	for i := 1; i <= n; i++ {
-		spaces += "    "
+
+func checkUnread(c echo.Context) error {
+	if config.EcoMode {
+		return c.NoContent(http.StatusNoContent)
 	}
-	res = strings.ReplaceAll(s, "\n", spaces)
-	return
+	ms, cs, _, err := client.Message.InboxUnread(c.Request().Context(), oneItem)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, err)
+	}
+	if len(ms) > 0 || len(cs) > 0 {
+		return c.NoContent(http.StatusOK)
+	}
+	return c.NoContent(http.StatusNoContent)
 }
 
 // up/down/remove-vote for post/coment

@@ -17,6 +17,11 @@ function togDisplay(elem){
 		hide(elem);
 	}
 }
+function backgroundUnread(){
+	fetch(baseURL+'/checkunread/', {method: 'HEAD'}).then(r =>{
+		console.log(r.status);
+	});
+}
 
 function get(url){
 	return fetch(baseURL+url, {method: 'GET'});
@@ -211,7 +216,7 @@ function vote(that){
 	return false;
 }
 function docOnLoad(){
-	
+	backgroundUnread();
 	const links = document.getElementsByClassName('link');
 	
 	

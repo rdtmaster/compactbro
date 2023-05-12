@@ -53,7 +53,7 @@ replace values in `<...>` with relevant data, do not include `<` and `>`
 
 Before describing the config process, let's summarize it to help you decide what you need and don't need depending on your goals.
 
-1. **Running `compactbro` locally, without replacing `i.reddit.com`**. No HTTPs and no Authentication
+1. **Running `compactbro` locally, without replacing `i.reddit.com`**. No HTTPS and no Authentication
 2. **Running `compactbro` locally, replacing `i.reddit.com`**. No authentication, HTTPS enabled
 3. **Running `compactbro` on a remote server without replacing `i.reddit.com`**. Auth and optional (but recommended) HTTPS
 4. **Running `compactbro` on a remote server, replacing `i.reddit.com`**. Authentication+HTTPS.
