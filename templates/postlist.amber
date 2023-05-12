@@ -1,5 +1,6 @@
 mixin postList($p, $ptt)
 	$likes = likesInt($p.Likes)
+	$thumb = getThumb($p.Preview)
 	div
 		.thing
 		.link
@@ -15,11 +16,17 @@ mixin postList($p, $ptt)
 			.unvoted ? $likes == 0
 			.likes ? $likes == 1
 			.dislikes ? $likes == -1
+			if strNotEmpty($thumb)
+				a.thumbnail.may-blank[href=$p.URL]
+					img[height=70][width=70][src=$thumb]
 			if strNotEmpty($p.LinkFlairText)
 				span.linkflair #{$p.LinkFlairText}
 			p.title
 				a.may-blank[href=$p.Permalink] #{$p.Title}
-				span.domain (self)
+				if $p.IsSelfPost
+					span.domain (self)
+				else
+					span.domain (#{$p.Domain})
 			if $ptt == "0"
 				a.expando-button.collapsed.selftext[href="#"][onclick="return postBodyDisplay(this)"]
 			div.tagline

@@ -82,6 +82,14 @@ var tpls map[string]*template.Template
 
 var client *reddit.Client
 
+func getThumb(preview reddit.RedditPreview) string {
+	if len(preview.Images) == 0 {
+		return ""
+	}
+	return html.UnescapeString(preview.Images[0].Resolutions[0].URL)
+
+}
+
 func strNotEmpty(s string) bool {
 	return len(s) > 0
 }
@@ -250,6 +258,8 @@ func main() {
 		fmt.Println(err)
 		return
 	}
+
+	amber.FuncMap["getThumb"] = getThumb
 	amber.FuncMap["getDistinguished"] = getDistinguished
 	amber.FuncMap["isMine"] = isMine
 
@@ -424,6 +434,7 @@ func sub(c echo.Context) error {
 	}
 
 	posts, _, err := client.Subreddit.HotPosts(c.Request().Context(), c.Param("sub"), nil)
+
 	if err != nil {
 		return c.String(http.StatusInternalServerError, err.Error())
 	}
