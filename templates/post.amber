@@ -11,7 +11,7 @@ block content
 			div.panestack-title
 				span.title all #{$.WP.NumberOfComments} comments
 			div.menuarea.subtoolbar 
-			form#postComment.usertext.cloneable.warn-on-unload
+			form.usertext.cloneable.warn-on-unload[onsubmit="return submitComment(this)"]
 				input[type="hidden"][name="thing_id"][value=$.WP.FullID]
 				div.usertext-edit.md-container
 					div.md

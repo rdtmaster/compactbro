@@ -161,14 +161,24 @@ function submitComment(pf){
 	const json = form2json(pf);
 	const errDisplay = pf.getElementsByClassName('error')[0];
 	errDisplay.textContent ='Loading...';
+	
 	pst('/comment',json)
 		.then(r => {
 			if (r.status === 200) {
 				errDisplay.textContent ='';
 				pf.getElementsByTagName('textarea')[0].value='';
 				r.text().then(t => {
+					const par = pf.parentNode;
+					const isRoot = !par.classList.contains('comment');
+					if (isRoot){
 					document.getElementsByClassName('nestedlisting')[0]
 						.insertAdjacentHTML('afterbegin',t);
+					} else {
+						const child = document.createElement('div');
+						child.classList.add('child');
+						child.innerHTML = t;
+						par.appendChild(child);
+					}
 					
 				});
 			} else {
@@ -177,6 +187,7 @@ function submitComment(pf){
 				});
 			}
 		});
+		return false;
 }
 
 function vote(that){
@@ -229,14 +240,6 @@ function docOnLoad(){
 	const links = document.getElementsByClassName('link');
 	
 	
-	const postCommentForm = document.getElementById('postComment');
-	if (postCommentForm){
-		console.log('triggered');
-		postCommentForm.addEventListener("submit",e => {
-			e.preventDefault();
-			submitComment(postCommentForm);
-		});
-	}
 }
 
 document.addEventListener("DOMContentLoaded", docOnLoad);

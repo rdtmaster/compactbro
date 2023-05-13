@@ -52,7 +52,7 @@ mixin comment($c)
 						|Edit
 		div.child.commentreply.hidden
 				div.thing.comment
-					form.usertext[action="#"]
+					form.usertext[action="#"][onsubmit="return submitComment(this);"]
 						input[name="thing_id"][value=$c.FullID][type="hidden"]
 						textarea[name="text"][cols=1][rows=1]
 						div.bottom-area
