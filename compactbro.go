@@ -433,6 +433,7 @@ func subSorted(c echo.Context, sorting string) error {
 	switch strings.ToLower(sorting) {
 	case "new":
 		f = client.Subreddit.NewPosts
+
 	case "hot":
 		f = client.Subreddit.HotPosts
 	case "rising":
@@ -449,6 +450,7 @@ func subSorted(c echo.Context, sorting string) error {
 	if err != nil {
 		return c.String(http.StatusInternalServerError, err.Error())
 	}
+
 	if !config.EcoMode {
 		sr, _, err := client.Subreddit.Get(c.Request().Context(), c.Param("sub"))
 		if err != nil {
