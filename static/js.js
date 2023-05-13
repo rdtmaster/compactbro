@@ -80,8 +80,23 @@ function editFormDisplay(that){
 	return false;
 }
 function replyFormDisplay(that){
-	const thing = that.parentNode.parentNode.parentNode;
-	togDisplay(thing.getElementsByClassName('commentreply')[0]);
+	const cr = that.parentNode.parentNode.parentNode
+		.getElementsByClassName('commentreply')[0];
+	togDisplay(cr);
+	const list = cr.getElementsByClassName('comment')[0].getElementsByClassName('usertext')[0].childNodes
+	for (e of list){
+		if (e.name === 'text'){
+			const strs = window.getSelection().toString().split("\r\n\r\n");
+			const ln = strs.length - 1;
+			for (var i = 0;i < ln+1;i++) {
+				e.value += '> '+strs[i].trim();
+				if (i < ln){
+					e.value += "\r\n\r\n";
+				}
+			}
+			break;
+		}
+	}
 	return false;
 }
 
@@ -134,7 +149,6 @@ function showErrors(status, errors, errDisplay){
 }
 
 function editSubmit(uf){
-	
 	const json = form2json(uf);
 	const errDisplay = uf.getElementsByClassName('error')[0];
 	errDisplay.textContent ='Loading...';
@@ -153,7 +167,6 @@ function editSubmit(uf){
 				showErrors(r.status, j.json.errors, errDisplay)
 			}
 		}));
-		
 		return false;
 }
 
@@ -161,7 +174,6 @@ function submitComment(pf){
 	const json = form2json(pf);
 	const errDisplay = pf.getElementsByClassName('error')[0];
 	errDisplay.textContent ='Loading...';
-	
 	pst('/comment',json)
 		.then(r => {
 			if (r.status === 200) {
@@ -237,8 +249,6 @@ function vote(that){
 }
 function docOnLoad(){
 	backgroundUnread();
-	const links = document.getElementsByClassName('link');
-	
 	
 }
 
