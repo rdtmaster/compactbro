@@ -132,10 +132,15 @@ You will need to "Add security exception" when visiting https://i.reddit.com for
 
 ## Roadmap for future versions
 [ ] Full support for DM messages
+
 [ ] Submit new post
+
 [ ] Create sub
+
 [ ] Open video links
+
 [ ] Moderation
+
 [ ] Caching
 
 ## Compatability and intentional decisions
