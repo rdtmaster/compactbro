@@ -113,36 +113,33 @@ CRTPath = "/certs/certificate.pem"
 You will need to "Add security exception" when visiting https://i.reddit.com for the first time. During these operations you will see a lot of security here-be-dragons-like warnings. In general it is safe to ignore them since you are dealing with certificates you just signed yourself, but note that you do everything at your own risk.
 
 ## V1 roadmap
-[x] View subs
-[x] View Posts+comments
-[x] Edit posts
-[ ] Edit comments
-[ ] Handle more comments
-[x] Comment under post and reply to comments
-[ ] Delete comment
-[ ] Delete post
-[x] Check inbox and display orange icon
-[ ] View messages
-[ ] User overview
-[x] Coloreful post/comment flairs
-[x] User attrs (submitter, mod, admin)
-[x] Image/video thumbnails
-[ ] Mark NSFW, spoiler
-[ ] Create good readme (partially complete)
+- [x] View subs
+- [x] View Posts+comments
+- [x] Edit posts
+- [ ] Edit comments
+- [ ] Handle more comments
+- [x] Comment under post and reply to comments
+- [ ] Delete comment
+- [ ] Delete post
+- [x] Check inbox and display orange icon
+- [ ] View messages
+- [ ] User overview
+- [x] Coloreful post/comment flairs
+- [x] User attrs (submitter, mod, admin)
+- [x] Image/video thumbnails
+- [ ] Mark NSFW, spoiler
+- [ ] Create good readme (partially complete)
 
 ## Roadmap for future versions
-[ ] Full support for DM messages
-
-[ ] Submit new post
-
-[ ] Create sub
-
-[ ] Open video links
-
-[ ] Moderation
-
-[ ] Caching
+- [ ] Full support for DM messages
+- [ ] Submit new post
+- [ ] Create sub
+- [ ] Open video links
+- [ ] Moderation
+- [ ] Caching
+- [ ] night mode
 
 ## Compatability and intentional decisions
-1. Compactbro web interface supports Firefox 47.0 and server supports Windows 7x32. Effort should be made to try and support older versions of Firefox. At no point should Compactbro ever drop Windows 7 (incl.32 bit) support or bump minimum supported browser version. If adding any new feature requires to raise those minimum system requirements, that feature should be forgotten.
-2. Compactbro assumes you are over 18 and are willing to view NSFW and spoiler content. By using this software you confirm you reached that age and have no issue with adult materials.
+1. Javascript (e.g. frontend) has been completely re-written without use of `jQuery` library. Adopting reddit's codebase would be even harder then coding everything from scratch. Initial plan was to leave HTML and CSS untouched, but it was impossible
+2. Compactbro web interface supports Firefox 47.0 and server supports Windows 7x32. Effort should be made to try and support older versions of Firefox. At no point should Compactbro ever drop Windows 7 (incl.32 bit) support or bump minimum supported browser version. If adding any new feature requires to raise those minimum system requirements, that feature should be forgotten.
+3. Compactbro assumes you are over 18 and are willing to view NSFW and spoiler content. By using this software you confirm you reached that age and have no issue with adult materials.
