@@ -39,9 +39,10 @@ type voteResult struct {
 	Thing_id  string `json:"thing_id"`
 }
 type CompactConfig struct {
-	EcoMode      bool
-	LocalAddress string
-	HTTPS        struct {
+	EcoMode            bool
+	DisplayFlairEmojis bool
+	LocalAddress       string
+	HTTPS              struct {
 		Use          bool
 		LocalAddress string
 		KeyPath      string
@@ -82,8 +83,14 @@ var tpls map[string]*template.Template
 
 var client *reddit.Client
 
+const emptyHTML = template.HTML("")
+
 func emoji(f reddit.RichFlair) template.HTML {
-	return template.HTML(fmt.Sprintf(`<span class="flairemoji" title="%s" style="background-image: url('%s')"></span>`, html.UnescapeString(f.A), html.UnescapeString(f.U)))
+	if config.DisplayFlairEmojis {
+		return template.HTML(fmt.Sprintf(`<span class="flairemoji" title="%s" style="background-image: url('%s')"></span>`, html.UnescapeString(f.A), html.UnescapeString(f.U)))
+	}
+	return emptyHTML
+
 }
 func getThumb(preview reddit.RedditPreview) string {
 	if len(preview.Images) == 0 {
