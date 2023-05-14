@@ -12,6 +12,7 @@ mixin comment($c)
 			.likes?$likes == 1
 				div.tagline
 					+author($c.Author, getDistinguished($c.Distinguished,$c.IsSubmitter))
+					+authorFlair($c.AuthorFlairRichtext, $c.AuthorFlairText, $c.AuthorFlairBackground, $c.AuthorFlairColor)
 					+score($c.Score)
 					span.live-timestamp[title=$c.Created]#{dateAgo($c.Created)}
 					if $c.TotalAwards > 0

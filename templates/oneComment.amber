@@ -3,5 +3,6 @@ import comment
 import midcol
 import score
 import author
+import authorflair
 import awardings
 +comment($.Comment)

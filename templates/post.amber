@@ -3,6 +3,7 @@ block content
 	import awardings
 	import score
 	import author
+	import authorflair
 	div#siteTable.sitetable.linklisting
 		import midcol
 		import postlist

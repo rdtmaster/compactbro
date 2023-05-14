@@ -82,6 +82,9 @@ var tpls map[string]*template.Template
 
 var client *reddit.Client
 
+func emoji(f reddit.RichFlair) template.HTML {
+	return template.HTML(fmt.Sprintf(`<span class="flairemoji" title="%s" style="background-image: url('%s')"></span>`, html.UnescapeString(f.A), html.UnescapeString(f.U)))
+}
 func getThumb(preview reddit.RedditPreview) string {
 	if len(preview.Images) == 0 {
 		return ""
@@ -258,6 +261,7 @@ func main() {
 		fmt.Println(err)
 		return
 	}
+	amber.FuncMap["emoji"] = emoji
 
 	amber.FuncMap["getThumb"] = getThumb
 	amber.FuncMap["getDistinguished"] = getDistinguished

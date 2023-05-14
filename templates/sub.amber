@@ -6,5 +6,6 @@ block content
 		import awardings
 		import score
 		import author
+		import authorflair
 		each $post in Items
 			+postList($post, "0")

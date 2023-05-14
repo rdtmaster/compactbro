@@ -1,0 +1,20 @@
+mixin textflair($fbc, $ftc, $text)
+	span
+		.flair
+		.flaircolordark? $ftc == "dark"
+		.flaircolorlight? $ftc == "light"
+		.noshadow? strNotEmpty($fbc) && $fbc != "transparent"
+		[style="background: "+$fbc]? strNotEmpty($fbc)  && $fbc != "transparent"
+		[title=$text]
+		|#{$text}
+
+mixin authorFlair($flairs, $flairtext, $fbc, $ftc)
+	if strNotEmpty($flairtext) || len($flairs)>0
+			if len($flairs) == 0
+				+textflair($fbc, $ftc, $flairtext)
+			else
+				each $f in $flairs
+					if $f.E == "text" && strNotEmpty($f.T) && $f.T != " "
+						+textflair($fbc, $ftc, $f.T)
+					else if $f.E == "emoji"
+						|#{emoji($f)}

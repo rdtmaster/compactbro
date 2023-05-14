@@ -24,8 +24,8 @@ mixin postList($p, $ptt)
 					.linkflair
 					.flaircolordark? $p.LinkFlairColor == "dark"
 					.flaircolorlight? $p.LinkFlairColor == "light"
-					.noshadow?strNotEmpty($p.LinkFlairBackground)
-					[style="background: "+$p.LinkFlairBackground]? strNotEmpty($p.LinkFlairBackground)
+					.noshadow?strNotEmpty($p.LinkFlairBackground) && $p.LinkFlairBackground != "transparent"
+					[style="background: "+$p.LinkFlairBackground]? strNotEmpty($p.LinkFlairBackground) && $p.LinkFlairBackground != "transparent"
 					|#{$p.LinkFlairText}
 			p.title
 				a.may-blank[href=$p.Permalink] #{$p.Title}
@@ -43,14 +43,8 @@ mixin postList($p, $ptt)
 				span
 					|&#32;by&#32;
 					+author($p.Author, getDistinguished($p.Distinguished,(2==1)))
-				if strNotEmpty($p.AuthorFlairText)
-					span
-						.flair
-						.flaircolordark? $p.AuthorFlairColor == "dark"
-						.flaircolorlight? $p.AuthorFlairColor == "light"
-						.noshadow? strNotEmpty($p.AuthorFlairBackground)
-						[style="background: "+$p.AuthorFlairBackground]? strNotEmpty($p.AuthorFlairBackground)
-						|#{$p.AuthorFlairText}
+				if strNotEmpty($p.AuthorFlairText) || len($p.AuthorFlairRichtext)>0
+					+authorFlair($p.AuthorFlairRichtext, $p.AuthorFlairText, $p.AuthorFlairBackground, $p.AuthorFlairColor)
 				if $p.TotalAwards > 0
 					+awardings($p.Awardings)
 		a.options_link[href="#"][onclick="return optionsDisplay(this)"]
