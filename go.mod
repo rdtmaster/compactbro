@@ -7,7 +7,7 @@ require (
 	github.com/eknkc/amber v0.0.0-20171010120322-cdade1c07385
 	github.com/kirsle/configdir v0.0.0-20170128060238-e45d2f54772f
 	github.com/labstack/echo/v4 v4.10.2
-	github.com/rdtmaster/go-reddit/v3 v3.0.0-20230505134728-616c9cd93c76
+	github.com/rdtmaster/go-reddit/v3 v3.0.0-20230514130915-650455a7f580
 )
 
 require (
@@ -28,3 +28,5 @@ require (
 	google.golang.org/appengine v1.6.7 // indirect
 	google.golang.org/protobuf v1.30.0 // indirect
 )
+
+replace github.com/rdtmaster/go-reddit/v3 v3.0.0-20230514130915-650455a7f580 => github.com/rdtmaster/go-reddit/v4 v4.0.0-20230514174526-aeb3f22c0ba0
