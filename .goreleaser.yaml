@@ -30,9 +30,10 @@ archives:
     - goos: windows
       format: zip
     files:
-      - static/**/*
-      - certs/**/*
-      - templates/**/*
+      - static/*
+      - certs/*
+      - templates/*
+      - compactbro.sample.toml
 
 checksum:
   name_template: 'checksums.txt'
