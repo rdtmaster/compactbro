@@ -1,4 +1,15 @@
 # CompactBro
+Miss the old reddit mobile web/compact/wap interface (`i.reddit.com`, `.compact`)? Worry not, CompactBro brings it back!
+
+1. Download version for your platform -> https://github.com/rdtmaster/compactbro/releases/latest
+2. Unzip
+3. Rename `compactbro.sample.toml` -> `compactbro.toml`
+4. From your reddit account, Create a new app with script access, then specify your `secret`, `id`, reddit login and password in `compactbro.toml`
+5. Launch the app
+6. http://localhost/ <- in your browser address bar
+
+More (much more!) details below
+
 ## what it is?
 A reddit client for web that focuses on fast load time, old browser compatability and delivering user experience similar or at least reasonably close to that provided by i.reddit.com mobile interface, also known as `.compact`.
  
@@ -21,17 +32,16 @@ I thought about it but there are several obstacles. One of the most ambitious go
 Work in progress!
 **WARNING the software is not functional yet do not install it!**
 
-- Download binary for your operating system
-- Place `templates` and `static` in the same folder (TODO <- automate it with Github Actions)
-
-### Install from source
-```shell
+First, download binary for your operating system from the releases page.  Alternatively, clone this repo and build it (you need `git` and functional go >= 1.20.3 installation):
+```bash
 git clone https://github.com/rdtmaster/compactbro
+#(wait...)
 cd compactbro
 go mod tidy
 go build
+chmod +x compactbro && ./compactbro #on *nix
+compactbro.exe #on windows
 ```
-
 ## Configuration
 - Login to reddit and head over to **preferences** => **apps**, create a new APP. The name could be any (e.g. `compactbro`), type should be `script` and other fields are optional. Note down App ID and secret.
 - create config file `compactbro.toml` in your `<default-config-directory>\compactbro` (if you are unsure of the location, launch the software and it will print the path in use, create the file there)
