@@ -16,7 +16,6 @@ builds:
       - darwin
 
 archives:
-  
   - format: tar.gz
     # this name template makes the OS and Arch compatible with the results of uname.
     name_template: >-
@@ -31,7 +30,9 @@ archives:
     - goos: windows
       format: zip
     files:
-      - compactbro.png
+      - static/**/*
+      - certs/**/*
+      - templates/**/*
 
 checksum:
   name_template: 'checksums.txt'
