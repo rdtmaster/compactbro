@@ -34,8 +34,8 @@ github.com/mattn/go-isatty v0.0.18 h1:DOKFKCQ7FNG2L1rbrmstDN4QVRdS89Nkh85u68Uwp9
 github.com/mattn/go-isatty v0.0.18/go.mod h1:W+V8PltTTMOvKvAeJH7IuucS94S2C6jfK/D7dTCTo3Y=
 github.com/pmezard/go-difflib v1.0.0 h1:4DBwDE0NGyQoBHbLQYPwSUPoCMWR5BEzIk/f1lZbAQM=
 github.com/pmezard/go-difflib v1.0.0/go.mod h1:iKH77koFhYxTK1pcRnkKkqfTogsbg7gZNVY4sRDYZ/4=
-github.com/rdtmaster/go-reddit/v4 v4.0.0-20230514174526-aeb3f22c0ba0 h1:CZQOiJhwMia7UpoWELsTONIxzsfW4L3tE2xerDX9/wc=
-github.com/rdtmaster/go-reddit/v4 v4.0.0-20230514174526-aeb3f22c0ba0/go.mod h1:920MWRBoSKCBfgq9x7xOpzYYogL2HpERI8bQjMuTbmA=
+github.com/rdtmaster/go-reddit/v4 v4.0.0-20230515180815-fd6f269afdeb h1:Jq1rEBmyTYxt3UeIqh9hvy1sgySGQALv1qsbJz7lOmg=
+github.com/rdtmaster/go-reddit/v4 v4.0.0-20230515180815-fd6f269afdeb/go.mod h1:920MWRBoSKCBfgq9x7xOpzYYogL2HpERI8bQjMuTbmA=
 github.com/stretchr/objx v0.1.0/go.mod h1:HFkY916IF+rwdDfMAkV7OtwuqBVzrE8GR6GFx+wExME=
 github.com/stretchr/testify v1.5.1/go.mod h1:5W2xD1RspED5o8YsWQXVCued0rvSQ+mT+I5cxcmMvtA=
 github.com/stretchr/testify v1.7.0/go.mod h1:6Fq8oRcR53rry900zMqJjRRixrwX3KX962/h/Wwjteg=
