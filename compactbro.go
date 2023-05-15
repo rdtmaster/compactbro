@@ -33,7 +33,11 @@ type commentSubmP struct {
 	Thing_id string `json:"thing_id"`
 	Text     string `json:"text"`
 }
-
+type PostOrComment struct {
+	Kind string
+	P    *reddit.Post
+	C    *reddit.Comment
+}
 type voteResult struct {
 	Direction string `json:"direction"`
 	Thing_id  string `json:"thing_id"`
@@ -318,6 +322,8 @@ func main() {
 	server.GET("/r/:sub/:sorting", subDisplay)
 	server.GET("/r/:sub/:sorting/", subDisplay)
 	server.GET("/r/:sub/comments/:id/:permalink/", submission)
+	server.GET("/user/:sub/comments/:id/:permalink/", submission)
+	server.GET("/u/:username/", overview)
 	server.POST("/edit/", editThing)
 	server.POST("/comment*", submitComment)
 	server.GET("/vote/:direction/:thing_id/", vote)
@@ -529,5 +535,81 @@ func submission(c echo.Context) error {
 	fmt.Println()
 	fmt.Println("--------")
 
+	return err
+}
+
+// user overview
+// This function must be reworked or retested, hard to believe it actually works
+func overview(c echo.Context) error {
+
+	l := &reddit.ListUserOverviewOptions{Sort: "new"}
+
+	posts, comments, _, err := client.User.OverviewOf(c.Request().Context(), c.Param("username"), l)
+
+	if err != nil {
+		return c.String(http.StatusInternalServerError, err.Error())
+	}
+
+	a := make([]PostOrComment, len(posts)+len(comments))
+	fmt.Println("len ", len(posts)+len(comments))
+	i := 0
+	iPosts := 0
+	iComments := 0
+	for posts[iPosts].Pinned || posts[iPosts].Stickied {
+		a[i] = PostOrComment{
+			Kind: "post",
+			P:    posts[iPosts],
+			C:    nil,
+		}
+		i++
+		iPosts++
+	}
+	for ; i < len(a); i++ {
+		put := false
+		if iPosts == len(posts) {
+			a[i] = PostOrComment{
+				Kind: "comment",
+				P:    nil,
+				C:    comments[iComments],
+			}
+			iComments++
+			put = true
+		} else if iComments == len(comments) {
+			a[i] = PostOrComment{
+				Kind: "post",
+				C:    nil,
+				P:    posts[iPosts],
+			}
+			iPosts++
+			put = true
+		}
+		if !put {
+			if posts[iPosts].Created.After(comments[iComments].Created.Time) {
+				a[i] = PostOrComment{
+					Kind: "post",
+					P:    posts[iPosts],
+					C:    nil,
+				}
+				iPosts++
+			} else {
+				a[i] = PostOrComment{
+					Kind: "comment",
+					P:    nil,
+					C:    comments[iComments],
+				}
+				iComments++
+			}
+		}
+	}
+	err = tpls["overview"].Execute(c.Response(), struct {
+		PageTitle string
+		Items     []PostOrComment
+	}{
+		PageTitle: "Overview for " + c.Param("username"),
+		Items:     a,
+	})
+	if err != nil {
+		return c.String(http.StatusInternalServerError, err.Error())
+	}
 	return err
 }

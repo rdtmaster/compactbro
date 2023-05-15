@@ -6,8 +6,8 @@ block content
 	import authorflair
 	div#siteTable.sitetable.linklisting
 		import midcol
-		import postlist
-		+postList($.WP, "1")
+		import link
+		+link($.WP, "1")
 		div.commentarea
 			div.panestack-title
 				span.title all #{$.WP.NumberOfComments} comments

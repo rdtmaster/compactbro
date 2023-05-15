@@ -1,11 +1,11 @@
 extends header
 block content
 	div#siteTable.sitetable.linklisting
-		import postlist
+		import link
 		import midcol
 		import awardings
 		import score
 		import author
 		import authorflair
 		each $post in Items
-			+postList($post, "0")
+			+link($post, "0")

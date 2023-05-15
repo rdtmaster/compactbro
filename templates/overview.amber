@@ -1,0 +1,15 @@
+extends header
+block content
+	import awardings
+	import score
+	import author
+	import authorflair
+	import midcol
+	import link
+	import comment
+	div#siteTable.sitetable
+		each $t in $.Items
+			if $t.Kind == "post"
+				+link($t.P, 0)
+			else
+				+comment($t.C)

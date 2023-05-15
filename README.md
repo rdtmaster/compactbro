@@ -1,12 +1,11 @@
 # CompactBro
 Miss the old reddit mobile web/compact/wap interface (`i.reddit.com`, `.compact`)? Worry not, CompactBro brings it back!
 
-1. Download version for your platform -> https://github.com/rdtmaster/compactbro/releases/latest
-2. Unzip
-3. Rename `compactbro.sample.toml` -> `compactbro.toml`
-4. From your reddit account, Create a new app with script access, then specify your `secret`, `id`, reddit login and password in `compactbro.toml`
-5. Launch the app
-6. http://localhost/ <- in your browser address bar
+1. Download & unzip a version for your platform -> https://github.com/rdtmaster/compactbro/releases/latest
+2. Rename `compactbro.sample.toml` -> `compactbro.toml`
+3. From your reddit account, Create a new app with script access, then specify your `secret`, `id`, reddit login and password in `compactbro.toml`. Link to do it -> https://old.reddit.com/prefs/apps
+4. Launch the app
+5. http://localhost/ <- in your browser address bar
 
 More (much more!) details below
 

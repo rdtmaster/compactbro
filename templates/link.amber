@@ -1,4 +1,4 @@
-mixin postList($p, $ptt)
+mixin link($p, $ptt)
 	$likes = likesInt($p.Likes)
 	$thumb = getThumb($p.Preview)
 	div
@@ -47,6 +47,8 @@ mixin postList($p, $ptt)
 					+authorFlair($p.AuthorFlairRichtext, $p.AuthorFlairText, $p.AuthorFlairBackground, $p.AuthorFlairColor)
 				if $p.TotalAwards > 0
 					+awardings($p.Awardings)
+				if $p.Stickied && !$p.Pinned
+					span.stickied-tagline[title="announcement"]&nbsp;-&nbsp;announcement
 		a.options_link[href="#"][onclick="return optionsDisplay(this)"]
 		div.expando
 			.hidden?$ptt == "0"

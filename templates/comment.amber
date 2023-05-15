@@ -17,6 +17,8 @@ mixin comment($c)
 					span.live-timestamp[title=$c.Created]#{dateAgo($c.Created)}
 					if $c.TotalAwards > 0
 						+awardings($c.Awardings)
+					if $c.Stickied
+						span[style="float:right"].stickied-tagline[title="selected by this subreddit's moderators"] stickied comment
 			a.options_link[href="#"][onclick="return optionsDisplay(this)"]
 			form.usertext[action="#"][method="POST"][onsubmit="return editSubmit(this)"]
 				input[name="thing_id"][value=$c.FullID][type="hidden"]
