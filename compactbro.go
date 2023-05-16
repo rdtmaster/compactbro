@@ -555,6 +555,7 @@ func overview(c echo.Context) error {
 	i := 0
 	iPosts := 0
 	iComments := 0
+
 	for posts[iPosts].Pinned || posts[iPosts].Stickied {
 		a[i] = PostOrComment{
 			Kind: "post",

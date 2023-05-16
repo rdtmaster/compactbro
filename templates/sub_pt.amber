@@ -1,0 +1,8 @@
+import link
+import midcol
+import awardings
+import score
+import author
+import authorflair
+each $post in $.Items
+	+link($post, "0")

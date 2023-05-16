@@ -26,13 +26,19 @@ mixin link($p, $ptt)
 					.flaircolorlight? $p.LinkFlairColor == "light"
 					.noshadow?strNotEmpty($p.LinkFlairBackground) && $p.LinkFlairBackground != "transparent"
 					[style="background: "+$p.LinkFlairBackground]? strNotEmpty($p.LinkFlairBackground) && $p.LinkFlairBackground != "transparent"
+					[title=$p.LinkFlairText]
 					|#{$p.LinkFlairText}
-			p.title
-				a.may-blank[href=$p.Permalink] #{$p.Title}
+			p.title[title=unescaped($p.Title)]
 				if $p.IsSelfPost
+					a.may-blank[href=$p.Permalink] #{unescaped($p.Title)}
 					span.domain (self)
 				else
+					a.may-blank[href=$p.URL] #{unescaped($p.Title)}
 					span.domain (#{$p.Domain})
+				if $p.NSFW
+					acronym[title="Adult content: Not Safe For Work"].nsfw-warning NSFW
+				if $p.Spoiler
+					acronym[title="Spoiler"].spoiler-warning SPOILER
 			if $ptt == "0"
 				a.expando-button.collapsed.selftext[href="#"][onclick="return postBodyDisplay(this)"]
 			div.tagline
