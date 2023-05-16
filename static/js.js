@@ -1,4 +1,6 @@
 const baseURL = ''; //same domain
+var moreURL = '';
+const doc = document.documentElement;
 function unimpl(){
 	alert('Unimplemented!!!');
 	return false;
@@ -247,8 +249,27 @@ function vote(that){
 	});
 	return false;
 }
+
+function scrolling(){
+	const sTop = doc.scrollTop;
+	const sHeight = doc.scrollHeight;
+	const cHeight = doc.clientHeight;
+	const aftercontainers = document.getElementsByClassName('aftercontainer');
+	const after = aftercontainers[aftercontainers.length-1].value;
+	if (sTop + cHeight >= sHeight){
+		get(moreURL+'?after='+after).then(r => {
+			if (r.status === 200) {
+				r.text().then(t => {
+					document.getElementById('siteTable')
+						.insertAdjacentHTML('beforeend', t);
+				});
+			}
+		});
+	}
+}
 function docOnLoad(){
 	backgroundUnread();
+	
 	
 }
 

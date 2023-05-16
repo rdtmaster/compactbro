@@ -38,7 +38,9 @@ type commentSubmP struct {
 
 type overviewWrap struct {
 	PageTitle string
+	Username  string
 	After     string
+	Sorting   string
 	Items     []PostOrComment
 }
 type PostOrComment struct {
@@ -344,6 +346,10 @@ func main() {
 	server.GET("/r/:sub/comments/:id/:permalink/", submission)
 	server.GET("/user/:sub/comments/:id/:permalink/", submission)
 	server.GET("/u/:username/", overview)
+	server.GET("/u/:username", overview)
+	server.GET("/u/:username/:sorting", overview)
+	server.GET("/u/:username/:sorting/", overview)
+	server.GET("/u/:username/:sorting/pt/", overviewPT)
 	server.POST("/edit/", editThing)
 	server.POST("/comment*", submitComment)
 	server.GET("/vote/:direction/:thing_id/", vote)
@@ -600,21 +606,41 @@ func overviewResp(c echo.Context, username, after, sorting, tpl string) error {
 			(a[j].P.Pinned || a[j].P.Stickied) {
 			return false
 		}
-		var t, u time.Time
-		if a[i].Kind == "post" {
-			t = a[i].P.Created.Time
-		} else {
-			t = a[i].C.Created.Time
+
+		switch sorting {
+		case "hot", "top", "controversial": // TODO: <- create sorting by upvote ratio etc
+			var t, u int
+			if a[i].Kind == "post" {
+				t = a[i].P.Score
+			} else {
+				t = a[i].C.Score
+			}
+			if a[j].Kind == "post" {
+				u = a[j].P.Score
+			} else {
+				u = a[j].C.Score
+			}
+			return u < t
+
+		default:
+			var t, u time.Time
+			if a[i].Kind == "post" {
+				t = a[i].P.Created.Time
+			} else {
+				t = a[i].C.Created.Time
+			}
+			if a[j].Kind == "post" {
+				u = a[j].P.Created.Time
+			} else {
+				u = a[j].C.Created.Time
+			}
+			return u.Before(t)
 		}
-		if a[j].Kind == "post" {
-			u = a[j].P.Created.Time
-		} else {
-			u = a[j].C.Created.Time
-		}
-		return u.Before(t)
 	})
 	err = tpls[tpl].Execute(c.Response(), overviewWrap{
 		PageTitle: "Overview for " + c.Param("username"),
+		Username:  c.Param("username"),
+		Sorting:   sorting,
 		After:     resp.After,
 		Items:     a,
 	})
@@ -626,10 +652,25 @@ func overviewResp(c echo.Context, username, after, sorting, tpl string) error {
 
 // user overview
 func overview(c echo.Context) error {
+	sorting := strings.ToLower(c.Param("sorting"))
+	if len(sorting) == 0 {
+		sorting = "new"
+	}
 	return overviewResp(c,
 		c.Param("username"),
 		c.QueryParam("after"),
 
-		"new",
+		sorting,
 		"overview")
+}
+
+// /u/<user>/{hot|new|top|controversial}/pt/
+func overviewPT(c echo.Context) error {
+	type partRespOverview struct {
+	}
+	return overviewResp(c,
+		c.Param("username"),
+		c.QueryParam("after"),
+		c.Param("sorting"),
+		"overview_pt")
 }

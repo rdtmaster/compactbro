@@ -125,18 +125,19 @@ You will need to "Add security exception" when visiting https://i.reddit.com for
 - [x] View subs
 - [x] View Posts+comments
 - [x] Edit posts
-- [ ] Edit comments
+- [x] Edit comments
 - [ ] Handle more comments
 - [x] Comment under post and reply to comments
 - [ ] Delete comment
 - [ ] Delete post
+- [ ] Infinite scrolling subreddit and user overview page (1/2 complete)
 - [x] Check inbox and display orange icon
 - [ ] View messages
-- [ ] User overview
+- [x] User overview
 - [x] Coloreful post/comment flairs
 - [x] User attrs (submitter, mod, admin)
 - [x] Image/video thumbnails
-- [ ] Mark NSFW, spoiler
+- [x] Mark NSFW, spoiler
 - [ ] Create good readme (partially complete)
 
 ## Roadmap for future versions
@@ -147,8 +148,15 @@ You will need to "Add security exception" when visiting https://i.reddit.com for
 - [ ] Moderation
 - [ ] Caching
 - [ ] night mode
+- [ ] Use better template engine
+
+
+## Versioning policy
+It'll be nice if v1 can ever see the light and even nicer if something beyond that gets released.
+Minor versions are subject for eventual delition from the releases section, except the latest one. At the moment v1 is the only major version planned, its goal in a nutshell: "*release something that compiles and lets you browse and comment*". New major version should be released once something notable happens.
 
 ## Compatability and intentional decisions
 1. Javascript (e.g. frontend) has been completely re-written without use of `jQuery` library. Adopting reddit's codebase would be even harder then coding everything from scratch. Initial plan was to leave HTML and CSS untouched, but it was impossible
 2. Compactbro web interface supports Firefox 47.0 and server supports Windows 7x32. Effort should be made to try and support older versions of Firefox. At no point should Compactbro ever drop Windows 7 (incl.32 bit) support or bump minimum supported browser version. If adding any new feature requires to raise those minimum system requirements, that feature should be forgotten.
 3. Compactbro assumes you are over 18 and are willing to view NSFW and spoiler content. By using this software you confirm you reached that age and have no issue with adult materials.
+4. Compactbro uses the `amber` engine. It turned out to be pretty backward and limited in terms of functionality, most notably it has no support for recursive mixins. That said, I enjoyed using this engine, it makes creating templates very fast, probably as rapid as it could be. Making page templates still eight around 70% of the time spent to develop this software, with any other engine I doubt I can ever finish it.
