@@ -2,3 +2,5 @@ extends header
 block content
 	div#siteTable.sitetable.linklisting
 		import sub_pt
+	script
+		var x ="dudum";

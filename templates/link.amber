@@ -28,13 +28,13 @@ mixin link($p, $ptt)
 					[style="background: "+$p.LinkFlairBackground]? strNotEmpty($p.LinkFlairBackground) && $p.LinkFlairBackground != "transparent"
 					[title=$p.LinkFlairText]
 					|#{$p.LinkFlairText}
-			p.title[title=unescaped($p.Title)]
+			p.title
 				if $p.IsSelfPost
-					a.may-blank[href=$p.Permalink] #{unescaped($p.Title)}
+					a.may-blank[title=unescaped($p.Title)][href=$p.Permalink] #{unescaped($p.Title)}
 					span.domain (self)
 				else
-					a.may-blank[href=$p.URL] #{unescaped($p.Title)}
-					span.domain (#{$p.Domain})
+					a.may-blank[title=unescaped($p.Title)][href=$p.URL] #{unescaped($p.Title)}
+					span.domain (#{unescaped($p.Domain)})
 				if $p.NSFW
 					acronym[title="Adult content: Not Safe For Work"].nsfw-warning NSFW
 				if $p.Spoiler

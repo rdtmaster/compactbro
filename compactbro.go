@@ -10,6 +10,8 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"sort"
+	"strconv"
 
 	"github.com/BurntSushi/toml"
 	"github.com/kirsle/configdir"
@@ -33,6 +35,12 @@ type commentSubmP struct {
 	Thing_id string `json:"thing_id"`
 	Text     string `json:"text"`
 }
+
+type overviewWrap struct {
+	PageTitle string
+	After     string
+	Items     []PostOrComment
+}
 type PostOrComment struct {
 	Kind string
 	P    *reddit.Post
@@ -45,6 +53,7 @@ type voteResult struct {
 type CompactConfig struct {
 	EcoMode            bool
 	DisplayFlairEmojis bool
+	DefaultLimit       int
 	LocalAddress       string
 	HTTPS              struct {
 		Use          bool
@@ -65,6 +74,17 @@ type CompactConfig struct {
 var oneItem = &reddit.ListOptions{Limit: 1}
 var config CompactConfig
 var server *echo.Echo
+
+func strToInt(s string) (res int) {
+	if len(s) == 0 {
+		return 0
+	}
+	res, err := strconv.Atoi(s)
+	if err != nil {
+		return 0
+	}
+	return
+}
 
 type DataWraper[T any] struct {
 	PageTitle string
@@ -538,79 +558,78 @@ func submission(c echo.Context) error {
 	return err
 }
 
-// user overview
 // This function must be reworked or retested, hard to believe it actually works
-func overview(c echo.Context) error {
+func overviewResp(c echo.Context, username, after, sorting, tpl string) error {
 
-	l := &reddit.ListUserOverviewOptions{Sort: "new"}
-
-	posts, comments, _, err := client.User.OverviewOf(c.Request().Context(), c.Param("username"), l)
+	l := &reddit.ListUserOverviewOptions{
+		Sort: sorting,
+	}
+	l.After = after
+	l.Limit = config.DefaultLimit
+	posts, comments, resp, err := client.User.OverviewOf(c.Request().Context(), username, l)
 
 	if err != nil {
 		return c.String(http.StatusInternalServerError, err.Error())
 	}
-
+	fmt.Println("==== after", after)
 	a := make([]PostOrComment, len(posts)+len(comments))
-	fmt.Println("len ", len(posts)+len(comments))
 	i := 0
-	iPosts := 0
-	iComments := 0
-
-	for posts[iPosts].Pinned || posts[iPosts].Stickied {
+	for _, post := range posts {
 		a[i] = PostOrComment{
 			Kind: "post",
-			P:    posts[iPosts],
+			P:    post,
 			C:    nil,
 		}
 		i++
-		iPosts++
 	}
-	for ; i < len(a); i++ {
-		put := false
-		if iPosts == len(posts) {
-			a[i] = PostOrComment{
-				Kind: "comment",
-				P:    nil,
-				C:    comments[iComments],
-			}
-			iComments++
-			put = true
-		} else if iComments == len(comments) {
-			a[i] = PostOrComment{
-				Kind: "post",
-				C:    nil,
-				P:    posts[iPosts],
-			}
-			iPosts++
-			put = true
+
+	for _, comment := range comments {
+		a[i] = PostOrComment{
+			Kind: "comment",
+			P:    nil,
+			C:    comment,
 		}
-		if !put {
-			if posts[iPosts].Created.After(comments[iComments].Created.Time) {
-				a[i] = PostOrComment{
-					Kind: "post",
-					P:    posts[iPosts],
-					C:    nil,
-				}
-				iPosts++
-			} else {
-				a[i] = PostOrComment{
-					Kind: "comment",
-					P:    nil,
-					C:    comments[iComments],
-				}
-				iComments++
-			}
-		}
+		i++
 	}
-	err = tpls["overview"].Execute(c.Response(), struct {
-		PageTitle string
-		Items     []PostOrComment
-	}{
+
+	sort.Slice(a, func(i, j int) bool {
+		if a[i].Kind == "post" &&
+			(a[i].P.Pinned || a[i].P.Stickied) {
+			return true
+		} else if a[j].Kind == "post" &&
+			(a[j].P.Pinned || a[j].P.Stickied) {
+			return false
+		}
+		var t, u time.Time
+		if a[i].Kind == "post" {
+			t = a[i].P.Created.Time
+		} else {
+			t = a[i].C.Created.Time
+		}
+		if a[j].Kind == "post" {
+			u = a[j].P.Created.Time
+		} else {
+			u = a[j].C.Created.Time
+		}
+		return u.Before(t)
+	})
+	err = tpls[tpl].Execute(c.Response(), overviewWrap{
 		PageTitle: "Overview for " + c.Param("username"),
+		After:     resp.After,
 		Items:     a,
 	})
 	if err != nil {
 		return c.String(http.StatusInternalServerError, err.Error())
 	}
 	return err
+}
+
+// user overview
+func overview(c echo.Context) error {
+	return overviewResp(c,
+		c.Param("username"),
+		c.QueryParam("after"),
+
+		"new",
+		"overview")
 }
