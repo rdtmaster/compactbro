@@ -1,10 +1,15 @@
 extends header
+block subtoolbar
+	div.subtoolbar
+		ul.tabmenu
+			li.selected
+				a.choice[href="#"] comments
 block content
-	import awardings
-	import score
-	import author
-	import authorflair
 	div#siteTable.sitetable.linklisting
+		import awardings
+		import score
+		import author
+		import authorflair
 		import midcol
 		import link
 		+link($.WP, "1")
@@ -23,6 +28,4 @@ block content
 						button.newbutton.save[type="submit"] Save
 					div[style="clear:both;"]
 			div.sitetable.nestedlisting
-				import comment
-				each $c in $.Items
-					+comment($c)
+				import post_pt

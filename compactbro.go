@@ -55,6 +55,7 @@ type voteResult struct {
 }
 type CompactConfig struct {
 	EcoMode            bool
+	NightMode          bool
 	DisplayFlairEmojis bool
 	DefaultLimit       int
 	LocalAddress       string

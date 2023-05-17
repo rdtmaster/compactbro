@@ -1,11 +1,14 @@
 mixin author($username, $attrs)
-	a
-		.author
-		.may-blank
-		.submitter?$attrs.Submitter
-		.moderator?$attrs.Moderator
-		.admin?$attrs.Admin
-		[href="/u/"+$username]
-		#{$username}
-	if strNotEmpty($attrs.Letters)
-		span.userattrs#{html($attrs.Letters)}
+	if $username == "[deleted]"
+		&#91;deleted&#93;
+	else
+		a
+			.author
+			.may-blank
+			.submitter?$attrs.Submitter
+			.moderator?$attrs.Moderator
+			.admin?$attrs.Admin
+			[href="/u/"+$username]
+			#{$username}
+		if strNotEmpty($attrs.Letters)
+			span.userattrs#{html($attrs.Letters)}

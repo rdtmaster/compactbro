@@ -1,0 +1,8 @@
+import midcol
+import author
+import authorflair
+import score
+import awardings
+import comment
+each $c in $.Items
+	+comment($c)
