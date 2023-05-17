@@ -6,3 +6,4 @@ import author
 import authorflair
 each $post in $.Items
 	+link($post, "0")
+import after

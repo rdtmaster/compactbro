@@ -10,4 +10,4 @@ each $t in $.Items
 		+link($t.P, 0)
 	else
 		+comment($t.C)
-input.aftercontainer[type="hidden"][value=$.After]
+import after

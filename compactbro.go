@@ -44,6 +44,13 @@ type overviewWrap struct {
 	Sorting   string
 	Items     []PostOrComment
 }
+type SubredditResponseWrapper struct {
+	PageTitle string
+	Sub       string
+	After     string
+	Sorting   string
+	Items     []*reddit.Post
+}
 type PostOrComment struct {
 	Kind string
 	P    *reddit.Post
@@ -343,14 +350,15 @@ func main() {
 	server.GET("/stop*", shutdown)
 	server.GET("/r/:sub", subDefault)
 	server.GET("/r/:sub/", subDefault)
-	server.GET("/r/:sub/:sorting", subDisplay)
-	server.GET("/r/:sub/:sorting/", subDisplay)
+	server.GET("/r/:sub/:sorting", subSorted)
+	server.GET("/r/:sub/:sorting/", subSorted)
+	server.GET("/pt/r/:sub/", subPT)
 	server.GET("/r/:sub/comments/:id/:permalink/", submission)
 	server.GET("/user/:sub/comments/:id/:permalink/", submission)
 	server.GET("/u/:username/", overview)
 	server.GET("/u/:username", overview)
 	server.GET("/u/:username/:page/", overview)
-	server.GET("/u/:username/:page/pt/", overviewPT)
+	server.GET("/pt/u/:username/:page/", overviewPT)
 	server.POST("/edit/", editThing)
 	server.POST("/comment*", submitComment)
 	server.GET("/vote/:direction/:thing_id/", vote)
@@ -471,7 +479,12 @@ func editThing(c echo.Context) error {
 	return c.JSON(http.StatusOK, r)
 }
 
-func subSorted(c echo.Context, sorting string) error {
+func getSubreddit(c echo.Context, sub, after, sorting, tpl string) error {
+	l := &reddit.ListOptions{
+		Limit: config.DefaultLimit,
+		After: after,
+	}
+
 	var pageTitle string
 	var f func(context.Context, string, *reddit.ListOptions) ([]*reddit.Post, *reddit.Response, error)
 	switch strings.ToLower(sorting) {
@@ -489,7 +502,7 @@ func subSorted(c echo.Context, sorting string) error {
 	default:
 		f = client.Subreddit.HotPosts
 	}
-	posts, _, err := f(c.Request().Context(), c.Param("sub"), nil)
+	posts, resp, err := f(c.Request().Context(), c.Param("sub"), l)
 
 	if err != nil {
 		return c.String(http.StatusInternalServerError, err.Error())
@@ -505,18 +518,20 @@ func subSorted(c echo.Context, sorting string) error {
 		if len(posts) > 0 {
 			pageTitle = posts[0].SubredditNamePrefixed
 		} else {
-			pageTitle = "/r/" + c.Param("sub")
+			pageTitle = "/r/" + sub
 		}
 	}
 
 	start := time.Now()
 
-	pw := DataWraper[reddit.Post]{
+	pw := SubredditResponseWrapper{
 		PageTitle: pageTitle,
+		After:     resp.After,
+		Sub:       sub,
+		Sorting:   sorting,
 		Items:     posts,
 	}
-
-	err = tpls["sub"].Execute(c.Response(), pw)
+	err = tpls[tpl].Execute(c.Response(), pw)
 
 	if err != nil {
 		return c.String(http.StatusInternalServerError, err.Error())
@@ -531,10 +546,28 @@ func subSorted(c echo.Context, sorting string) error {
 
 // sub
 func subDefault(c echo.Context) error {
-	return subSorted(c, "hot")
+	return getSubreddit(c,
+		c.Param("sub"),
+		c.QueryParam("after"),
+		"new",
+		"sub")
 }
-func subDisplay(c echo.Context) error {
-	return subSorted(c, c.Param("sorting"))
+
+// /r/<sub>/pt/?sorting={hot|new...}&after=t****
+func subPT(c echo.Context) error {
+	return getSubreddit(c,
+		c.Param("sub"),
+		c.QueryParam("after"),
+		c.QueryParam("sort"),
+		"sub_pt")
+}
+func subSorted(c echo.Context) error {
+	return getSubreddit(c,
+		c.Param("sub"),
+		c.QueryParam("after"),
+		c.Param("sorting"),
+		"sub")
+
 }
 
 // View post
@@ -566,7 +599,7 @@ func submission(c echo.Context) error {
 }
 
 // This function must be reworked or retested, hard to believe it actually works
-func overviewResp(c echo.Context, username, after, page, sorting, tpl string) error {
+func getOverview(c echo.Context, username, after, page, sorting, tpl string) error {
 
 	l := &reddit.ListUserOverviewOptions{
 		Sort: sorting,
@@ -675,7 +708,7 @@ func overview(c echo.Context) error {
 	if len(page) == 0 {
 		page = "overview"
 	}
-	return overviewResp(c,
+	return getOverview(c,
 		c.Param("username"),
 		c.QueryParam("after"),
 		page,
@@ -687,7 +720,7 @@ func overview(c echo.Context) error {
 func overviewPT(c echo.Context) error {
 	type partRespOverview struct {
 	}
-	return overviewResp(c,
+	return getOverview(c,
 		c.Param("username"),
 		c.QueryParam("after"),
 		c.Param("page"),

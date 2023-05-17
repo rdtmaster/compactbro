@@ -41,3 +41,5 @@ html
 		block subtoolbar
 		div.content
 			block content
+		div#loaderimg.hidden
+			img[src="/static/loading.gif"][width=70][height=70]

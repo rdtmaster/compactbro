@@ -1,6 +1,24 @@
 extends header
+block subtoolbar
+	$cur_url = "/r/"+$.Sub+"/"
+	div.subtoolbar
+		ul.tabmenu
+			li
+				.selected? $.Sorting == "hot"
+				a.choice[href=$cur_url+"hot"] hot
+			li
+				.selected? $.Sorting == "new"
+				a.choice[href=$cur_url+"new"] new
+			li
+				.selected? $.Sorting == "top"
+				a.choice[href=$cur_url+"top"] top
+			li
+				.selected? $.Sorting == "controversial"
+				a.choice[href=$cur_url+"controversial"] controversial
 block content
 	div#siteTable.sitetable.linklisting
 		import sub_pt
 	script
-		var x ="dudum";
+		sorting = '#{$.Sorting}';
+		moreURL = baseURL+'/pt/r/#{$.Sub}/';
+		window.addEventListener('scroll', scrolling);

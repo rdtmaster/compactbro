@@ -1,6 +1,7 @@
 const baseURL = ''; //same domain
 var moreURL = '';
-var ingsort = '';
+var sorting = '';
+var inProgress = false;
 const doc = document.documentElement;
 function unimpl(){
 	alert('Unimplemented!!!');
@@ -257,13 +258,19 @@ function scrolling(){
 	const cHeight = doc.clientHeight;
 	const aftercontainers = document.getElementsByClassName('aftercontainer');
 	const after = aftercontainers[aftercontainers.length-1].value;
-	if (sTop + cHeight >= sHeight && after && after.length > 1){
+	if (!inProgress && sTop + cHeight >= sHeight && after && after.length > 1){
+		const loader = document.getElementById('loaderimg');
+		togDisplay(loader);
 		get(moreURL+'?after='+after+'&sort='+sorting).then(r => {
+			hide(loader);
 			if (r.status === 200) {
 				r.text().then(t => {
+					console.log('here');
 					document.getElementById('siteTable')
 						.insertAdjacentHTML('beforeend', t);
 				});
+			} else {
+				alert('Error fetching more data: '+r.status);
 			}
 		});
 	}

@@ -34,5 +34,5 @@ block content
 		import overview_pt
 	script
 		sorting = '#{$.Sorting}';
-		moreURL = baseURL+'/u/#{$.Username}/#{$.Page}/pt/';
+		moreURL = baseURL+'/pt/u/#{$.Username}/#{$.Page}/';
 		window.addEventListener('scroll', scrolling);
