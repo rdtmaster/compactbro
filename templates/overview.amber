@@ -1,7 +1,38 @@
 extends header
+block subtoolbar
+	$overview_url = "/u/"+$.Username+"/"
+	$submitted_url = $overview_url+"submitted/"
+	$comments_url = $overview_url+"comments/"
+	$cur_url = $overview_url+$.Page+"/"
+	div.subtoolbar
+		ul.tabmenu
+			li
+				.selected? $.Page == "overview"
+				a.choice[href=$overview_url] overview
+			li
+				.selected? $.Page == "comments"
+				a.choice[href=$comments_url] comments
+			li
+				.selected? $.Page == "submitted"
+				a.choice[href=$submitted_url] submitted
+	div.subtoolbar
+		ul.tabmenu
+			li
+				.selected? $.Sorting == "hot"
+				a.choice[href=$cur_url+"?sort=hot"] hot
+			li
+				.selected? $.Sorting == "new"
+				a.choice[href=$cur_url+"?sort=new"] new
+			li
+				.selected? $.Sorting == "top"
+				a.choice[href=$cur_url+"?sort=top"] top
+			li
+				.selected? $.Sorting == "controversial"
+				a.choice[href=$cur_url+"?sort=controversial"] controversial
 block content
 	div#siteTable.sitetable
 		import overview_pt
 	script
-		moreURL = baseURL+'/u/#{$.Username}/#{$.Sorting}/pt/';
+		sorting = '#{$.Sorting}';
+		moreURL = baseURL+'/u/#{$.Username}/#{$.Page}/pt/';
 		window.addEventListener('scroll', scrolling);

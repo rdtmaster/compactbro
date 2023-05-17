@@ -1,5 +1,6 @@
 const baseURL = ''; //same domain
 var moreURL = '';
+var ingsort = '';
 const doc = document.documentElement;
 function unimpl(){
 	alert('Unimplemented!!!');
@@ -256,8 +257,8 @@ function scrolling(){
 	const cHeight = doc.clientHeight;
 	const aftercontainers = document.getElementsByClassName('aftercontainer');
 	const after = aftercontainers[aftercontainers.length-1].value;
-	if (sTop + cHeight >= sHeight){
-		get(moreURL+'?after='+after).then(r => {
+	if (sTop + cHeight >= sHeight && after && after.length > 1){
+		get(moreURL+'?after='+after+'&sort='+sorting).then(r => {
 			if (r.status === 200) {
 				r.text().then(t => {
 					document.getElementById('siteTable')

@@ -153,7 +153,7 @@ You will need to "Add security exception" when visiting https://i.reddit.com for
 
 ## Versioning policy
 It'll be nice if v1 can ever see the light and even nicer if something beyond that gets released.
-Minor versions are subject for eventual delition from the releases section, except the latest one. At the moment v1 is the only major version planned, its goal in a nutshell: "*release something that compiles and lets you browse and comment*". New major version should be released once something notable happens.
+Minor versions are subject for eventual delition from the releases section, except the latest one. At the moment v1 is the only major version planned, its goal in a nutshell: "*release something that compiles and lets you browse and comment*". New major version should be released once something notable happens, minor versions are released whenever I want to see if it still works.
 
 ## Compatability and intentional decisions
 1. Javascript (e.g. frontend) has been completely re-written without use of `jQuery` library. Adopting reddit's codebase would be even harder then coding everything from scratch. Initial plan was to leave HTML and CSS untouched, but it was impossible

@@ -39,6 +39,7 @@ type commentSubmP struct {
 type overviewWrap struct {
 	PageTitle string
 	Username  string
+	Page      string
 	After     string
 	Sorting   string
 	Items     []PostOrComment
@@ -347,9 +348,8 @@ func main() {
 	server.GET("/user/:sub/comments/:id/:permalink/", submission)
 	server.GET("/u/:username/", overview)
 	server.GET("/u/:username", overview)
-	server.GET("/u/:username/:sorting", overview)
-	server.GET("/u/:username/:sorting/", overview)
-	server.GET("/u/:username/:sorting/pt/", overviewPT)
+	server.GET("/u/:username/:page/", overview)
+	server.GET("/u/:username/:page/pt/", overviewPT)
 	server.POST("/edit/", editThing)
 	server.POST("/comment*", submitComment)
 	server.GET("/vote/:direction/:thing_id/", vote)
@@ -565,15 +565,27 @@ func submission(c echo.Context) error {
 }
 
 // This function must be reworked or retested, hard to believe it actually works
-func overviewResp(c echo.Context, username, after, sorting, tpl string) error {
+func overviewResp(c echo.Context, username, after, page, sorting, tpl string) error {
 
 	l := &reddit.ListUserOverviewOptions{
 		Sort: sorting,
 	}
 	l.After = after
 	l.Limit = config.DefaultLimit
-	posts, comments, resp, err := client.User.OverviewOf(c.Request().Context(), username, l)
-
+	var posts []*reddit.Post
+	var comments []*reddit.Comment
+	var resp *reddit.Response
+	var err error
+	switch page {
+	case "submitted":
+		posts, resp, err = client.User.PostsOf(c.Request().Context(), username, l)
+		comments = nil
+	case "comments":
+		comments, resp, err = client.User.CommentsOf(c.Request().Context(), username, l)
+		posts = nil
+	default:
+		posts, comments, resp, err = client.User.OverviewOf(c.Request().Context(), username, l)
+	}
 	if err != nil {
 		return c.String(http.StatusInternalServerError, err.Error())
 	}
@@ -597,50 +609,52 @@ func overviewResp(c echo.Context, username, after, sorting, tpl string) error {
 		}
 		i++
 	}
+	if page == "overview" {
+		sort.Slice(a, func(i, j int) bool {
+			if a[i].Kind == "post" &&
+				(a[i].P.Pinned || a[i].P.Stickied) {
+				return true
+			} else if a[j].Kind == "post" &&
+				(a[j].P.Pinned || a[j].P.Stickied) {
+				return false
+			}
 
-	sort.Slice(a, func(i, j int) bool {
-		if a[i].Kind == "post" &&
-			(a[i].P.Pinned || a[i].P.Stickied) {
-			return true
-		} else if a[j].Kind == "post" &&
-			(a[j].P.Pinned || a[j].P.Stickied) {
-			return false
-		}
+			switch sorting {
+			case "hot", "top", "controversial": // TODO: <- create sorting by upvote ratio etc
+				var t, u int
+				if a[i].Kind == "post" {
+					t = a[i].P.Score
+				} else {
+					t = a[i].C.Score
+				}
+				if a[j].Kind == "post" {
+					u = a[j].P.Score
+				} else {
+					u = a[j].C.Score
+				}
+				return u < t
 
-		switch sorting {
-		case "hot", "top", "controversial": // TODO: <- create sorting by upvote ratio etc
-			var t, u int
-			if a[i].Kind == "post" {
-				t = a[i].P.Score
-			} else {
-				t = a[i].C.Score
+			default:
+				var t, u time.Time
+				if a[i].Kind == "post" {
+					t = a[i].P.Created.Time
+				} else {
+					t = a[i].C.Created.Time
+				}
+				if a[j].Kind == "post" {
+					u = a[j].P.Created.Time
+				} else {
+					u = a[j].C.Created.Time
+				}
+				return u.Before(t)
 			}
-			if a[j].Kind == "post" {
-				u = a[j].P.Score
-			} else {
-				u = a[j].C.Score
-			}
-			return u < t
-
-		default:
-			var t, u time.Time
-			if a[i].Kind == "post" {
-				t = a[i].P.Created.Time
-			} else {
-				t = a[i].C.Created.Time
-			}
-			if a[j].Kind == "post" {
-				u = a[j].P.Created.Time
-			} else {
-				u = a[j].C.Created.Time
-			}
-			return u.Before(t)
-		}
-	})
+		})
+	}
 	err = tpls[tpl].Execute(c.Response(), overviewWrap{
 		PageTitle: "Overview for " + c.Param("username"),
 		Username:  c.Param("username"),
 		Sorting:   sorting,
+		Page:      page,
 		After:     resp.After,
 		Items:     a,
 	})
@@ -652,14 +666,18 @@ func overviewResp(c echo.Context, username, after, sorting, tpl string) error {
 
 // user overview
 func overview(c echo.Context) error {
-	sorting := strings.ToLower(c.Param("sorting"))
+	sorting := strings.ToLower(c.QueryParam("sort"))
 	if len(sorting) == 0 {
 		sorting = "new"
+	}
+	page := strings.ToLower(c.Param("page"))
+	if len(page) == 0 {
+		page = "overview"
 	}
 	return overviewResp(c,
 		c.Param("username"),
 		c.QueryParam("after"),
-
+		page,
 		sorting,
 		"overview")
 }
@@ -671,6 +689,7 @@ func overviewPT(c echo.Context) error {
 	return overviewResp(c,
 		c.Param("username"),
 		c.QueryParam("after"),
-		c.Param("sorting"),
+		c.Param("page"),
+		c.QueryParam("sort"),
 		"overview_pt")
 }

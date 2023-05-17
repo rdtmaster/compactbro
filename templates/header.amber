@@ -38,6 +38,6 @@ html
 			div#top_menu.hidden
 				div.menuitem
 					a[href="/stop/"] Stop
-		import subtoolbar
+		block subtoolbar
 		div.content
 			block content
