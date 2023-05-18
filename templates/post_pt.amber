@@ -4,5 +4,6 @@ import authorflair
 import score
 import awardings
 import comment
-each $c in $.Items
-	+comment($c)
+div.sitetable.nestedlisting
+	each $c in $.Items
+		+comment($c)

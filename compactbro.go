@@ -196,10 +196,16 @@ func getDistinguished(distinguished string, isSubmitter bool) (ua userAttrs) {
 }
 func processReplies(replies reddit.Replies) string {
 
+	for _, c := range replies.Comments {
+		if c.HasMore() {
+			c.Body_html += "<h1>I have more replies"
+		}
+	}
+
 	var buf bytes.Buffer
 	err := tpls["childComments"].Execute(&buf, replies)
 	if err != nil {
-		fmt.Println("Error! ", err.Error())
+		fmt.Println("=====Error in replies! ", err.Error())
 		return err.Error()
 	}
 
@@ -444,6 +450,7 @@ func vote(c echo.Context) error {
 // Submit comment
 func submitComment(c echo.Context) error {
 	var co commentSubmP
+
 	err := c.Bind(&co)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, err)

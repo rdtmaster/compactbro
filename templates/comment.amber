@@ -67,4 +67,10 @@ mixin comment($c)
 							div[style="clear:both"]
 		div.commentspacer
 		if hasReplies($c)
-			div.child #{html(processReplies($c.Replies))}
+			div.child
+				div.sitetable.listing#{html(processReplies($c.Replies))}
+		if $c.HasMore()
+			div.child
+				div.sitetable.listing
+					span.deepthread.button
+						a[href="#"] Continue this thread

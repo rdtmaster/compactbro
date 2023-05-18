@@ -27,5 +27,4 @@ block content
 						span.error.field-text
 						button.newbutton.save[type="submit"] Save
 					div[style="clear:both;"]
-			div.sitetable.nestedlisting
-				import post_pt
+			import post_pt
