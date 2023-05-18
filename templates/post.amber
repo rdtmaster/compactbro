@@ -28,3 +28,4 @@ block content
 						button.newbutton.save[type="submit"] Save
 					div[style="clear:both;"]
 			import post_pt
+			h1 After #{$.After}

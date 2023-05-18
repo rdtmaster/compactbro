@@ -43,6 +43,7 @@ type overviewWrap struct {
 	After     string
 	Sorting   string
 	Items     []PostOrComment
+	BodyClass string
 }
 type SubredditResponseWrapper struct {
 	PageTitle string
@@ -50,6 +51,7 @@ type SubredditResponseWrapper struct {
 	After     string
 	Sorting   string
 	Items     []*reddit.Post
+	BodyClass string
 }
 type PostOrComment struct {
 	Kind string
@@ -108,8 +110,11 @@ type DataWraper[T any] struct {
 	Items     []*T
 }
 type PCWrapper struct {
-	DataWraper[reddit.Comment]
-	WP *reddit.Post
+	PageTitle string
+	Items     []*reddit.Comment
+
+	BodyClass string
+	WP        *reddit.Post
 }
 
 type editP struct {
@@ -375,6 +380,7 @@ func main() {
 	server.POST("/edit/", editThing)
 	server.POST("/comment*", submitComment)
 	server.GET("/vote/:direction/:thing_id/", vote)
+	server.GET("/r/:sub/comments/:postID/:permalink/:commentID/", commentThread)
 
 	server.HEAD("/checkunread/", checkUnread)
 	// Start server
@@ -419,6 +425,34 @@ func checkUnread(c echo.Context) error {
 	return c.NoContent(http.StatusNoContent)
 }
 
+// comment thread display
+// /r/:sub/comments/:postID/:permalink/:commentID/
+func commentThread(c echo.Context) error {
+	//TODO: <- move it to the library
+	path := fmt.Sprintf("comments/%s/%s/%s", c.Param("postID"), c.Param("permalink"), c.Param("commentID"))
+	req, err := client.NewRequest(http.MethodGet, path, nil)
+	fmt.Println("=======", path, " ", req)
+	if err != nil {
+		c.String(http.StatusInternalServerError, err.Error())
+	}
+	pc := new(reddit.PostAndComments)
+	_, err = client.Do(c.Request().Context(), req, pc)
+	if err != nil {
+		c.String(http.StatusInternalServerError, err.Error())
+	}
+	pw := PCWrapper{
+		PageTitle: pc.Post.Title,
+		Items:     pc.Comments,
+		WP:        pc.Post,
+
+		BodyClass: "thread",
+	}
+
+	err = tpls["post"].Execute(c.Response(), pw)
+
+	return err
+}
+
 // up/down/remove-vote for post/coment
 // /vote/{up|down|remove}/<thing_id>/
 func vote(c echo.Context) error {
@@ -429,7 +463,6 @@ func vote(c echo.Context) error {
 	thing_id := c.Param("thing_id")
 
 	var f func(ctx context.Context, id string) (*reddit.Response, error)
-	f = client.Post.Upvote
 	switch direction {
 	case "up":
 		f = client.Post.Upvote
@@ -544,6 +577,7 @@ func getSubreddit(c echo.Context, sub, after, sorting, tpl string) error {
 		Sub:       sub,
 		Sorting:   sorting,
 		Items:     posts,
+		BodyClass: "sub",
 	}
 	err = tpls[tpl].Execute(c.Response(), pw)
 
@@ -592,14 +626,13 @@ func submission(c echo.Context) error {
 	if err != nil {
 		return c.String(http.StatusInternalServerError, err.Error())
 	}
-	pw := struct {
-		PageTitle string
-		Items     []*reddit.Comment
-		WP        *reddit.Post
-	}{}
-	pw.PageTitle = pc.Post.Title
-	pw.Items = pc.Comments
-	pw.WP = pc.Post
+	pw := PCWrapper{
+		PageTitle: pc.Post.Title,
+		Items:     pc.Comments,
+		WP:        pc.Post,
+
+		BodyClass: "post",
+	}
 
 	err = tpls["post"].Execute(c.Response(), pw)
 
@@ -705,6 +738,7 @@ func getOverview(c echo.Context, username, after, page, sorting, tpl string) err
 		Page:      page,
 		After:     resp.After,
 		Items:     a,
+		BodyClass: "overview",
 	})
 	if err != nil {
 		return c.String(http.StatusInternalServerError, err.Error())

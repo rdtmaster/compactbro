@@ -73,4 +73,4 @@ mixin comment($c)
 			div.child
 				div.sitetable.listing
 					span.deepthread.button
-						a[href="#"] Continue this thread
+						a[href=$c.PostPermalink+$c.ID+"/"] Continue this thread

@@ -15,7 +15,8 @@ html
 			[media="screen"]
 		title #{PageTitle}
 		script[type="text/javascript"][src="/static/js.js"]
-	body.listing-page.hot-page
+	body
+		.thread? $.BodyClass=="thread"
 		div#preload
 			div.commentcount
 				div.comments
