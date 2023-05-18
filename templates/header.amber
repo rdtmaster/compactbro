@@ -10,7 +10,7 @@ html
 		
 		link
 			[rel="stylesheet"]
-			[href="/static/compact.css"]
+			[href=cssTheme()]
 			[type="text/css"]
 			[media="screen"]
 		title #{PageTitle}

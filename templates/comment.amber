@@ -3,6 +3,7 @@ mixin comment($c)
 	div
 		.thing
 		.comment
+		.collapsed?$c.Collapsed
 		[data-id=$c.FullID]
 		+midcol1($likes)
 		div
@@ -44,15 +45,15 @@ mixin comment($c)
 					a[href="#"][onclick="unimpl()"]
 						div.context-icon
 						|Context
-					a[href="#"][onclick="unimpl()"]
-						div.permalink-icon
-						|Permalink
-					a[href="#"][onclick="unimpl()"]
-						div.collapse-icon
-						|Collapse
-					a[href="#"][onclick="return editFormDisplay(this)"]
-						div.edit-icon
-						|Edit
+				a[href="#"][onclick="unimpl()"]
+					div.permalink-icon
+					|Permalink
+				a[href="#"][onclick="return collapseComment(this)"]
+					div.collapse-icon
+					|Collapse
+				a[href="#"][onclick="return editFormDisplay(this)"]
+					div.edit-icon
+					|Edit
 		div.child.commentreply.hidden
 				div.thing.comment
 					form.usertext[action="#"][onsubmit="return submitComment(this);"]

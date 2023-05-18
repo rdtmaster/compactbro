@@ -152,6 +152,23 @@ function showErrors(status, errors, errDisplay){
 		errDisplay.innerHTML = s;
 }
 
+function collapseComment(that){
+	const comment = that.parentNode.parentNode.parentNode;
+	const ccl = comment.classList;
+	if (ccl.contains('collapsed')){
+		ccl.remove('collapsed');
+		comment.title = '';
+	} else {
+		ccl.add('collapsed');
+		comment.title = 'Double click to show';
+		comment.addEventListener('dblclick', e => {
+			collapseComment(that);
+			e.removeEventListener();
+		});
+	}
+	return false;
+}
+
 function editSubmit(uf){
 	const json = form2json(uf);
 	const errDisplay = uf.getElementsByClassName('error')[0];

@@ -1,3 +1,11 @@
+.panestack-title{
+	margin-left: 8px;
+	margin-bottom: 4px;
+	margin-top: 3px
+}
+.panestack-title .title{
+	color:#aeacff
+}
 #loaderimg {
     text-align: center;
 }
@@ -29,7 +37,7 @@
     color: #efefef;
 }
 body {
-    background: #c5ccd3;
+    background: #102030;
     font-family: Helvetica, "Helvetica Neue", Arial, sans-serif;
     margin: 0;
     width: 100%;
@@ -41,13 +49,15 @@ p {
     padding: 0;
 }
 a {
-    color: #517191;
+    color: #6bb9e8;
 }
 a:visited {
-    color: #4f565b;
+    color: #6bb9ea;
 }
 textarea {
     font-family: inherit;
+	background: transparent;
+	color: #dedede;
 }
 #preload {
     position: absolute;
@@ -86,11 +96,7 @@ textarea {
     -moz-border-radius: 6px;
     -webkit-border-radius: 6px;
     border-radius: 6px;
-    background: url("data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4gPHN2ZyB2ZXJzaW9uPSIxLjEiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGRlZnM+PGxpbmVhckdyYWRpZW50IGlkPSJncmFkIiBncmFkaWVudFVuaXRzPSJvYmplY3RCb3VuZGluZ0JveCIgeDE9IjAuNSIgeTE9IjAuMCIgeDI9IjAuNSIgeTI9IjEuMCI+PHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iI2JmZDBlMCIvPjxzdG9wIG9mZnNldD0iMTAwJSIgc3RvcC1jb2xvcj0iIzgwYTJjNCIvPjwvbGluZWFyR3JhZGllbnQ+PC9kZWZzPjxyZWN0IHg9IjAiIHk9IjAiIHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIGZpbGw9InVybCgjZ3JhZCkiIC8+PC9zdmc+IA==");
-    background: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #bfd0e0), color-stop(100%, #80a2c4));
-    background: -moz-linear-gradient(top, #bfd0e0, #80a2c4);
-    background: -webkit-linear-gradient(top, #bfd0e0, #80a2c4);
-    background: linear-gradient(to bottom, #bfd0e0, #80a2c4);
+	background: linear-gradient(to bottom, #bfd0e0, #80a2c4);
     background-color: #a0b9d2;
     height: 30px;
     line-height: 30px;
@@ -402,14 +408,10 @@ button.button {
     background-repeat: no-repeat;
 }
 #topbar {
-    background: url("data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4gPHN2ZyB2ZXJzaW9uPSIxLjEiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGRlZnM+PGxpbmVhckdyYWRpZW50IGlkPSJncmFkIiBncmFkaWVudFVuaXRzPSJvYmplY3RCb3VuZGluZ0JveCIgeDE9IjAuNSIgeTE9IjAuMCIgeDI9IjAuNSIgeTI9IjEuMCI+PHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iI2NlZTNmOCIvPjxzdG9wIG9mZnNldD0iMTAwJSIgc3RvcC1jb2xvcj0iI2E4YzRlMCIvPjwvbGluZWFyR3JhZGllbnQ+PC9kZWZzPjxyZWN0IHg9IjAiIHk9IjAiIHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIGZpbGw9InVybCgjZ3JhZCkiIC8+PC9zdmc+IA==");
-    background: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #cee3f8), color-stop(100%, #a8c4e0));
-    background: -moz-linear-gradient(top, #cee3f8, #a8c4e0);
-    background: -webkit-linear-gradient(top, #cee3f8, #a8c4e0);
-    background: linear-gradient(to bottom, #cee3f8, #a8c4e0);
-    background-color: #bbd4ec;
-    border-bottom: 1px solid #7599bd;
-    border-top: 1px solid #dceaf7;
+    background: linear-gradient(to bottom, #100046, #080024);
+    background-color: #080024;
+    border-bottom: 1px solid #080024;
+    border-top: 1px solid #0c005a;
     -moz-box-sizing: border-box;
     -webkit-box-sizing: border-box;
     box-sizing: border-box;
@@ -436,7 +438,7 @@ button.button {
     z-index: 3;
 }
 #topbar > h1 {
-    color: #444;
+    color: #ddd;
     font-size: 18px;
     font-weight: bold;
     text-align: center;
@@ -576,13 +578,9 @@ body[orient="landscape"] > #topbar > h1 {
     -webkit-box-sizing: border-box;
     box-sizing: border-box;
     height: 32px;
-    background: url("data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4gPHN2ZyB2ZXJzaW9uPSIxLjEiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGRlZnM+PGxpbmVhckdyYWRpZW50IGlkPSJncmFkIiBncmFkaWVudFVuaXRzPSJvYmplY3RCb3VuZGluZ0JveCIgeDE9IjAuNSIgeTE9IjAuMCIgeDI9IjAuNSIgeTI9IjEuMCI+PHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iI2ZmZmZmZiIvPjxzdG9wIG9mZnNldD0iMTAwJSIgc3RvcC1jb2xvcj0iI2NjY2NjYyIvPjwvbGluZWFyR3JhZGllbnQ+PC9kZWZzPjxyZWN0IHg9IjAiIHk9IjAiIHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIGZpbGw9InVybCgjZ3JhZCkiIC8+PC9zdmc+IA==");
-    background: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #ffffff), color-stop(100%, #cccccc));
-    background: -moz-linear-gradient(top, #ffffff, #cccccc);
-    background: -webkit-linear-gradient(top, #ffffff, #cccccc);
-    background: linear-gradient(to bottom, #ffffff, #cccccc);
+    background: linear-gradient(to bottom, #010a2d, #011a2a);
     background-color: #e6e6e6;
-    border-bottom: 1px solid #bbb;
+    border-bottom: 1px solid #010a41;
     padding: 6px;
     text-overflow: ellipsis;
     overflow: hidden;
@@ -598,7 +596,7 @@ body[orient="landscape"] > #topbar > h1 {
     overflow: hidden;
 }
 .subtoolbar > ul > li a {
-    color: #4c566c;
+    color: #85a5ff;
     font-weight: bold;
     text-decoration: none;
     font-size: 12px;
@@ -665,14 +663,14 @@ body[orient="landscape"] > #topbar > h1 {
 }
 .link {
     min-height: 70px;
-    border-bottom: 1px solid #999;
-    border-top: 1px solid #ddd;
+    border-bottom: 1px solid #101010;
+    border-top: 1px solid #101010;
     padding: 5px 5px;
     padding-bottom: 0px;
     -moz-box-sizing: border-box;
     -webkit-box-sizing: border-box;
     box-sizing: border-box;
-    background: rgba(255, 255, 255, 0.6);
+    background: rgba(25, 25, 25, 0.6);
     position: relative;
     overflow: hidden;
 }
@@ -680,7 +678,7 @@ body[orient="landscape"] > #topbar > h1 {
     border-top: none;
 }
 .link:nth-child(odd) {
-    background: rgba(206, 227, 248, 0.5);
+    background: rgba(20, 22, 24, 0.5);
 }
 .link > .rank {
     float: left;
@@ -750,8 +748,7 @@ body[orient="landscape"] > #topbar > h1 {
 }
 .link a {
     text-decoration: none;
-    color: #517191;
-    color: #369;
+    color: #6bb9e8;
 }
 .link p.title {
     margin: 0;
@@ -764,13 +761,13 @@ body[orient="landscape"] > #topbar > h1 {
 .link p.title > a {
     text-overflow: ellipsis;
     overflow: hidden;
-    color: #25a;
+    color: #6bb9e8;
 }
 .link.stickied p.title > a {
-    color: #228822;
+    color: #52bc52;
 }
 .link .domain {
-    color: #737373;
+    color: #bdb7bf;
     font-size: 9px;
     margin-left: 5px;
 }
@@ -783,7 +780,7 @@ body[orient="landscape"] > #topbar > h1 {
     padding: 0;
     padding-top: 2px;
     font-size: 10px;
-    color: #333;
+    color: #bdb7bf;
 }
 .link .tagline > span {
     margin-right: 2px;
@@ -793,7 +790,7 @@ body[orient="landscape"] > #topbar > h1 {
 }
 .link .tagline .stickied-tagline,
 .comment .tagline .stickied-tagline {
-    color: #228822;
+    color: #50de50;
 }
 .link .expando-button {
     float: left;
@@ -817,7 +814,7 @@ body[orient="landscape"] > #topbar > h1 {
     margin: 5px 0;
     margin-bottom: 30px;
     border: 1px solid #999;
-    background: #ddd;
+    background: #00020d;
     padding: 5px;
     -moz-border-radius: 8px;
     -webkit-border-radius: 8px;
@@ -904,7 +901,7 @@ body[orient="landscape"] > #topbar > h1 {
     margin: 0 10px;
 }
 .commentarea > .usertext {
-    background: white;
+    background: #121221;
     margin: 0 10px 5px;
     border: 1px solid #d9d9d9;
     -moz-border-radius: 8px;
@@ -1004,12 +1001,15 @@ body[orient="landscape"] > #topbar > h1 {
     margin: 5px;
 }
 .comment {
-    background: white;
-    border: 1px solid #d9d9d9;
+    background: #000e1d;
+    border: 1px solid #304254;
     margin: 10px;
     -moz-border-radius: 8px;
     -webkit-border-radius: 8px;
     border-radius: 8px;
+}
+.child .comment{
+	background: #000d1c;
 }
 .comment > .midcol {
     float: left;
@@ -1344,10 +1344,10 @@ body[orient="landscape"] > #topbar > h1 {
     color: orange;
 }
 .tagline .moderator {
-    color: #282;
+    color: #52bc52;
 }
 .tagline .admin {
-    color: #f01;
+    color: #ffc559;
 }
 .tagline .userattrs .cakeday {
     display: inline-block;
@@ -1741,6 +1741,7 @@ body[orient="landscape"] > #topbar > h1 {
     -moz-border-radius-bottomright: 5px;
 }
 .md {
+	color: #d2d2d5;
     overflow: auto;
     font-size: small;
 }

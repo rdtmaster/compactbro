@@ -86,6 +86,12 @@ var oneItem = &reddit.ListOptions{Limit: 1}
 var config CompactConfig
 var server *echo.Echo
 
+func cssTheme() string {
+	if config.NightMode {
+		return "/static/night.css"
+	}
+	return "/static/compact.css"
+}
 func strToInt(s string) (res int) {
 	if len(s) == 0 {
 		return 0
@@ -303,8 +309,9 @@ func main() {
 		fmt.Println(err)
 		return
 	}
-	amber.FuncMap["emoji"] = emoji
 
+	amber.FuncMap["emoji"] = emoji
+	amber.FuncMap["cssTheme"] = cssTheme
 	amber.FuncMap["getThumb"] = getThumb
 	amber.FuncMap["getDistinguished"] = getDistinguished
 	amber.FuncMap["isMine"] = isMine
