@@ -5,7 +5,11 @@ block subtoolbar
 			li.selected
 				a.choice[href="#"] comments
 block content
-	div#siteTable.sitetable.linklisting
+	div
+		#siteTable
+		.sitetable
+		.linklisting
+		.thread? $.Thread
 		import awardings
 		import score
 		import author
@@ -16,16 +20,17 @@ block content
 		div.commentarea
 			div.panestack-title
 				span.title all #{$.WP.NumberOfComments} comments
-			div.menuarea.subtoolbar 
-			form.usertext.cloneable.warn-on-unload[onsubmit="return submitComment(this)"]
-				input[type="hidden"][name="thing_id"][value=$.WP.FullID]
-				div.usertext-edit.md-container
-					div.md
-						textarea[name="text"]
-				div.bottom-area
-					div.usertext-buttons
-						span.error.field-text
-						button.newbutton.save[type="submit"] Save
-					div[style="clear:both;"]
+			if !$.Thread
+				div.menuarea.subtoolbar 
+				form.usertext.cloneable.warn-on-unload[onsubmit="return submitComment(this)"]
+					input[type="hidden"][name="thing_id"][value=$.WP.FullID]
+					div.usertext-edit.md-container
+						div.md
+							textarea[name="text"]
+					div.bottom-area
+						div.usertext-buttons
+							span.error.field-text
+							button.newbutton.save[type="submit"] Save
+						div[style="clear:both;"]
 			import post_pt
 			h1 After #{$.After}

@@ -38,6 +38,14 @@ mixin comment($c)
 				a[href="#"][onclick="return unimpl()"]
 					div.email-icon
 					|Share
+				if isPostID($c.ParentID)
+					a[href=cleanLink($c.PostPermalink)]
+						div.parent-icon
+						|Parent
+				else
+					a[href=cleanLink($c.PostPermalink)+cleanCommentID($c.ParentID)+"/"]
+						div.parent-icon
+						|Parent
 				a[href="#"][onclick="return replyFormDisplay(this)"]
 					div.reply-icon
 					|Reply
@@ -45,7 +53,7 @@ mixin comment($c)
 					a[href="#"][onclick="unimpl()"]
 						div.context-icon
 						|Context
-				a[href="#"][onclick="unimpl()"]
+				a[href=$c.Permalink]
 					div.permalink-icon
 					|Permalink
 				a[href="#"][onclick="return collapseComment(this)"]

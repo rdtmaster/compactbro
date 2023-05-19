@@ -16,7 +16,6 @@ html
 		title #{PageTitle}
 		script[type="text/javascript"][src="/static/js.js"]
 	body
-		.thread? $.BodyClass=="thread"
 		div#preload
 			div.commentcount
 				div.comments

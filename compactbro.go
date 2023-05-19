@@ -8,6 +8,7 @@ import (
 	"html/template"
 	"math"
 	"net/http"
+	"net/url"
 	"os"
 	"path/filepath"
 	"runtime"
@@ -45,7 +46,6 @@ type overviewWrap struct {
 	After     string
 	Sorting   string
 	Items     []PostOrComment
-	BodyClass string
 }
 type SubredditResponseWrapper struct {
 	PageTitle string
@@ -53,7 +53,6 @@ type SubredditResponseWrapper struct {
 	After     string
 	Sorting   string
 	Items     []*reddit.Post
-	BodyClass string
 }
 type PostOrComment struct {
 	Kind string
@@ -90,6 +89,27 @@ var oneItem = &reddit.ListOptions{Limit: 1}
 var config CompactConfig
 var server *echo.Echo
 
+func cleanCommentID(id string) (cleanID string) {
+	cleanID, _ = strings.CutPrefix(id, kindComment+"_")
+	return
+}
+func cleanLink(link string) string {
+	u, err := url.Parse(link)
+	if err != nil {
+		return link
+	}
+	s := u.Path
+	if !strings.HasPrefix(s, "/") {
+		s = "/" + s
+	}
+	if !strings.HasSuffix(s, "/") {
+		s = s + "/"
+	}
+	return s
+}
+func isPostID(parent string) bool {
+	return strings.HasPrefix(parent, kindPost)
+}
 func cVersion() (s string) {
 
 	s = fmt.Sprintf("%s (%s/%s) @ %s (PID %d)", curVersion, runtime.GOOS, runtime.GOARCH, config.LocalAddress, os.Getpid())
@@ -123,9 +143,8 @@ type DataWraper[T any] struct {
 type PCWrapper struct {
 	PageTitle string
 	Items     []*reddit.Comment
-
-	BodyClass string
 	WP        *reddit.Post
+	Thread    bool
 }
 
 type editP struct {
@@ -331,6 +350,10 @@ func main() {
 		fmt.Println(err)
 		return
 	}
+
+	amber.FuncMap["cleanCommentID"] = cleanCommentID
+	amber.FuncMap["cleanLink"] = cleanLink
+	amber.FuncMap["isPostID"] = isPostID
 	amber.FuncMap["cVersion"] = cVersion
 	amber.FuncMap["emoji"] = emoji
 	amber.FuncMap["cssTheme"] = cssTheme
@@ -361,6 +384,7 @@ func main() {
 		return
 	}
 	server = echo.New()
+	server.HideBanner = true
 	server.Static("/static", "static")
 	server.File("/favicon.ico", "static/favicon.ico")
 
@@ -458,8 +482,7 @@ func commentThread(c echo.Context) error {
 		PageTitle: pc.Post.Title,
 		Items:     pc.Comments,
 		WP:        pc.Post,
-
-		BodyClass: "thread",
+		Thread:    true,
 	}
 
 	err = tpls["post"].Execute(c.Response(), pw)
@@ -599,7 +622,6 @@ func getSubreddit(c echo.Context, sub, after, sorting string, fp bool, tpl strin
 		Sub:       sub,
 		Sorting:   sorting_,
 		Items:     posts,
-		BodyClass: "sub",
 	}
 	err = tpls[tpl].Execute(c.Response(), pw)
 
@@ -668,12 +690,12 @@ func submission(c echo.Context) error {
 	if err != nil {
 		return c.String(http.StatusInternalServerError, err.Error())
 	}
+
 	pw := PCWrapper{
 		PageTitle: pc.Post.Title,
 		Items:     pc.Comments,
 		WP:        pc.Post,
-
-		BodyClass: "post",
+		Thread:    false,
 	}
 
 	err = tpls["post"].Execute(c.Response(), pw)
@@ -780,7 +802,6 @@ func getOverview(c echo.Context, username, after, page, sorting, tpl string) err
 		Page:      page,
 		After:     resp.After,
 		Items:     a,
-		BodyClass: "overview",
 	})
 	if err != nil {
 		return c.String(http.StatusInternalServerError, err.Error())
