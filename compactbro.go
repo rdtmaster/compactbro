@@ -10,6 +10,7 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"runtime"
 	"sort"
 	"strconv"
 
@@ -27,6 +28,7 @@ import (
 )
 
 const (
+	curVersion  = "CompactBro v0.80"
 	kindComment = "t1"
 	kindPost    = "t3"
 )
@@ -88,6 +90,15 @@ var oneItem = &reddit.ListOptions{Limit: 1}
 var config CompactConfig
 var server *echo.Echo
 
+func cVersion() (s string) {
+
+	s = fmt.Sprintf("%s (%s/%s) @ %s (PID %d)", curVersion, runtime.GOOS, runtime.GOARCH, config.LocalAddress, os.Getpid())
+	if config.HTTPS.Use {
+		s += " HTTPS+"
+	}
+
+	return
+}
 func cssTheme() string {
 	if config.NightMode {
 		return "/static/night.css"
@@ -320,7 +331,7 @@ func main() {
 		fmt.Println(err)
 		return
 	}
-
+	amber.FuncMap["cVersion"] = cVersion
 	amber.FuncMap["emoji"] = emoji
 	amber.FuncMap["cssTheme"] = cssTheme
 	amber.FuncMap["getThumb"] = getThumb
@@ -366,10 +377,13 @@ func main() {
 
 	// Routes
 	server.GET("/stop*", shutdown)
+	server.GET("/", frontpage)
+	server.GET("/pt/", frontpagePT)
 	server.GET("/r/:sub", subDefault)
 	server.GET("/r/:sub/", subDefault)
 	server.GET("/r/:sub/:sorting", subSorted)
 	server.GET("/r/:sub/:sorting/", subSorted)
+
 	server.GET("/pt/r/:sub/", subPT)
 	server.GET("/r/:sub/comments/:id/:permalink/", submission)
 	server.GET("/user/:sub/comments/:id/:permalink/", submission)
@@ -526,7 +540,7 @@ func editThing(c echo.Context) error {
 	return c.JSON(http.StatusOK, r)
 }
 
-func getSubreddit(c echo.Context, sub, after, sorting, tpl string) error {
+func getSubreddit(c echo.Context, sub, after, sorting string, fp bool, tpl string) error {
 	l := &reddit.ListOptions{
 		Limit: config.DefaultLimit,
 		After: after,
@@ -534,7 +548,13 @@ func getSubreddit(c echo.Context, sub, after, sorting, tpl string) error {
 
 	var pageTitle string
 	var f func(context.Context, string, *reddit.ListOptions) ([]*reddit.Post, *reddit.Response, error)
-	switch strings.ToLower(sorting) {
+	var sorting_ string
+	if len(sorting) > 0 {
+		sorting_ = sorting
+	} else {
+		sorting_ = "new"
+	}
+	switch strings.ToLower(sorting_) {
 	case "new":
 		f = client.Subreddit.NewPosts
 
@@ -555,12 +575,14 @@ func getSubreddit(c echo.Context, sub, after, sorting, tpl string) error {
 		return c.String(http.StatusInternalServerError, err.Error())
 	}
 
-	if !config.EcoMode {
+	if !config.EcoMode && !fp {
 		sr, _, err := client.Subreddit.Get(c.Request().Context(), c.Param("sub"))
 		if err != nil {
 			return c.String(http.StatusInternalServerError, err.Error())
 		}
 		pageTitle = sr.Title
+	} else if fp {
+		pageTitle = "reddit - the front page of the internet"
 	} else {
 		if len(posts) > 0 {
 			pageTitle = posts[0].SubredditNamePrefixed
@@ -575,7 +597,7 @@ func getSubreddit(c echo.Context, sub, after, sorting, tpl string) error {
 		PageTitle: pageTitle,
 		After:     resp.After,
 		Sub:       sub,
-		Sorting:   sorting,
+		Sorting:   sorting_,
 		Items:     posts,
 		BodyClass: "sub",
 	}
@@ -591,6 +613,23 @@ func getSubreddit(c echo.Context, sub, after, sorting, tpl string) error {
 	fmt.Println("--------")
 	return err
 }
+func frontpage(c echo.Context) error {
+	return getSubreddit(c,
+		"",
+		c.QueryParam("after"),
+		c.QueryParam("sort"),
+		true,
+		"frontpage")
+}
+
+func frontpagePT(c echo.Context) error {
+	return getSubreddit(c,
+		"",
+		c.QueryParam("after"),
+		c.QueryParam("sort"),
+		true,
+		"sub_pt")
+}
 
 // sub
 func subDefault(c echo.Context) error {
@@ -598,6 +637,7 @@ func subDefault(c echo.Context) error {
 		c.Param("sub"),
 		c.QueryParam("after"),
 		"new",
+		false,
 		"sub")
 }
 
@@ -607,6 +647,7 @@ func subPT(c echo.Context) error {
 		c.Param("sub"),
 		c.QueryParam("after"),
 		c.QueryParam("sort"),
+		false,
 		"sub_pt")
 }
 func subSorted(c echo.Context) error {
@@ -614,6 +655,7 @@ func subSorted(c echo.Context) error {
 		c.Param("sub"),
 		c.QueryParam("after"),
 		c.Param("sorting"),
+		false,
 		"sub")
 
 }

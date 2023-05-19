@@ -1,0 +1,20 @@
+$hrf = "/r/compactbro/"
+div.thing.link.stickied
+	span.rank
+	div.midcol
+		div.arrow.up.upmod
+		div.arrow.down
+	div.commentcount
+		a.comments.may-blank[href=$hrf] ∞
+	div.entry.likes
+		p.title
+			a.may-blank[href=$hrf] CompactBro main thread
+			span.domain (CompactBro)
+		div.tagline
+			span
+				span.score.likes ∞ points
+				|&#32;Submitted&#32;
+				time just now
+			span
+				|&#32;by&#32;
+				a.admin.author.may-blank[href=$hrf] CompactBro

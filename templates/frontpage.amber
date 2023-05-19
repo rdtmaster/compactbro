@@ -1,0 +1,27 @@
+extends header
+block subtoolbar
+	$cur_url = "/r/"+$.Sub+"/"
+	div.subtoolbar
+		ul.tabmenu
+			li
+				.selected? $.Sorting == "hot"
+				a.choice[href="/?sort=hot"] hot
+			li
+				.selected? $.Sorting == "new"
+				a.choice[href="/?sort=new"] new
+			li
+				.selected? $.Sorting == "top"
+				a.choice[href="/?sort=top"] top
+			li
+				.selected? $.Sorting == "controversial"
+				a.choice[href="/?sort=controversial"] controversial
+			li.selected[style="float:right;padding-right: 7px"]
+				a.choice[href="#"]#{cVersion()}
+block content
+	div#siteTable.sitetable.linklisting.frontlisting
+		import cmp
+		import sub_pt
+	script
+		sorting = '#{$.Sorting}';
+		moreURL = baseURL+'/pt/';
+		window.addEventListener('scroll', scrolling);

@@ -51,6 +51,9 @@ mixin link($p, $ptt)
 					+author($p.Author, getDistinguished($p.Distinguished,(2==1)))
 				if strNotEmpty($p.AuthorFlairText) || len($p.AuthorFlairRichtext)>0
 					+authorFlair($p.AuthorFlairRichtext, $p.AuthorFlairText, $p.AuthorFlairBackground, $p.AuthorFlairColor)
+				span.subLink
+					|&nbsp;to&nbsp;
+					a[href="/"+$p.SubredditNamePrefixed]#{$p.SubredditNamePrefixed}
 				if $p.TotalAwards > 0
 					+awardings($p.Awardings)
 				if $p.Stickied && !$p.Pinned

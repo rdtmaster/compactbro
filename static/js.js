@@ -276,9 +276,11 @@ function scrolling(){
 	const aftercontainers = document.getElementsByClassName('aftercontainer');
 	const after = aftercontainers[aftercontainers.length-1].value;
 	if (!inProgress && sTop + cHeight >= sHeight && after && after.length > 1){
+		inProgress = true;
 		const loader = document.getElementById('loaderimg');
 		togDisplay(loader);
 		get(moreURL+'?after='+after+'&sort='+sorting).then(r => {
+			inProgress = false;
 			hide(loader);
 			if (r.status === 200) {
 				r.text().then(t => {
