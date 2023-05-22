@@ -1,0 +1,6 @@
+import midcol
+import author
+import message
+each $m in $.Items
+	+message($m)
+import after

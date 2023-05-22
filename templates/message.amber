@@ -1,0 +1,39 @@
+mixin message($m)
+	$likes = likesInt($m.Likes)
+	div
+		.thing
+		.message
+		.was_comment?$m.IsComment
+		.unread?$m.New
+		if $m.IsComment
+			+midcol2($likes)
+		div.entry
+			.unvoted ? $likes == 0
+			.likes ? $likes == 1
+			.dislikes ? $likes == -1
+			p.subject
+				span #{$m.Subject}
+				if $m.IsComment
+					a.title[href=linkFromContext($m.Context)]#{$m.LinkTitle}
+					
+			p.tagline
+				|from&nbsp;
+				span
+					if !isMine($m.Author)
+						+author($m.Author, getDistinguished($m.Distinguished,2==1))
+					if !isMine($m.To)
+						|&nbsp;to&nbsp;
+						span.correspondent
+							a.author.may-blank[href="/u/"+$m.To+"/"]#{$m.To}
+				if $m.IsComment
+					|&nbsp;via&nbsp;
+					span.subreddit
+						a[href=$m.SubredditNamePrefixed]#{$m.SubredditNamePrefixed}
+				|&nbsp;sent&nbsp;
+				time.live-timestamp[title=$m.Created]#{dateAgo($m.Created)}
+			div.usertext-body#{html($m.BodyHtml)}
+			if $m.IsComment
+				a.options_link[href="#"][onclick="return optionsDisplay(this)"]
+			div.metabuttons
+				button.markUnread Mark as unread
+				button.markRead Mark as read

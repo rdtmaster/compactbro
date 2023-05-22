@@ -1,0 +1,6 @@
+extends header
+block subtoolbar
+	none
+block content
+	div#siteTable.sitetable.messagelisting
+		import messages_pt

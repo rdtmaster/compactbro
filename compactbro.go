@@ -85,13 +85,19 @@ type CompactConfig struct {
 	TemplateOptions amber.Options
 }
 
-var oneItem = &reddit.ListOptions{Limit: 1}
 var config CompactConfig
 var server *echo.Echo
 
 func cleanCommentID(id string) (cleanID string) {
 	cleanID, _ = strings.CutPrefix(id, kindComment+"_")
 	return
+}
+func linkFromContext(context string) (link string) {
+	tmp, _ := strings.CutPrefix(context, "/r/")
+	as := strings.Split(tmp, "/")
+	link = fmt.Sprintf("/r/%s/comments/%s/", as[0], as[2])
+	return
+
 }
 func cleanLink(link string) string {
 	u, err := url.Parse(link)
@@ -351,6 +357,7 @@ func main() {
 		return
 	}
 
+	amber.FuncMap["linkFromContext"] = linkFromContext
 	amber.FuncMap["cleanCommentID"] = cleanCommentID
 	amber.FuncMap["cleanLink"] = cleanLink
 	amber.FuncMap["isPostID"] = isPostID
@@ -402,6 +409,7 @@ func main() {
 	// Routes
 	server.GET("/stop*", shutdown)
 	server.GET("/", frontpage)
+	server.GET("/messages/", inboxUnread)
 	server.GET("/pt/", frontpagePT)
 	server.GET("/r/:sub", subDefault)
 	server.GET("/r/:sub/", subDefault)
@@ -409,6 +417,7 @@ func main() {
 	server.GET("/r/:sub/:sorting/", subSorted)
 
 	server.GET("/pt/r/:sub/", subPT)
+	server.GET("/r/:sub/comments/:id/", submission)
 	server.GET("/r/:sub/comments/:id/:permalink/", submission)
 	server.GET("/user/:sub/comments/:id/:permalink/", submission)
 	server.GET("/u/:username/", overview)
@@ -453,6 +462,10 @@ func checkUnread(c echo.Context) error {
 	if config.EcoMode {
 		return c.NoContent(http.StatusNoContent)
 	}
+	oneItem := &reddit.MessageListOptions{
+		Mark: false,
+	}
+	oneItem.Limit = 1
 	ms, cs, _, err := client.Message.InboxUnread(c.Request().Context(), oneItem)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, err)
@@ -469,6 +482,8 @@ func commentThread(c echo.Context) error {
 	//TODO: <- move it to the library
 	path := fmt.Sprintf("comments/%s/%s/%s", c.Param("postID"), c.Param("permalink"), c.Param("commentID"))
 	req, err := client.NewRequest(http.MethodGet, path, nil)
+
+	fmt.Println("====ua ", req.UserAgent())
 	fmt.Println("=======", path, " ", req)
 	if err != nil {
 		c.String(http.StatusInternalServerError, err.Error())
@@ -583,6 +598,7 @@ func getSubreddit(c echo.Context, sub, after, sorting string, fp bool, tpl strin
 
 	case "hot":
 		f = client.Subreddit.HotPosts
+
 	case "rising":
 		f = client.Subreddit.RisingPosts
 	case "controversial":
@@ -633,6 +649,64 @@ func getSubreddit(c echo.Context, sub, after, sorting string, fp bool, tpl strin
 	fmt.Printf("sub rendered in %s", elapsed)
 	fmt.Println()
 	fmt.Println("--------")
+	return err
+}
+func inboxUnread(c echo.Context) error {
+	l := &reddit.MessageListOptions{
+
+		//Mark: true, //useless
+	}
+	l.Limit = 8
+	comments, messages, _, err := client.Message.InboxUnread(c.Request().Context(), l)
+
+	fmt.Println("=====messages======")
+	unread := make([]string, 0)
+	a := make([]*reddit.Message, len(messages)+len(comments))
+	index := 0
+	for _, msg := range messages {
+		a[index] = msg
+		index++
+		if msg.New {
+			unread = append(unread, msg.FullID)
+		}
+	}
+	for _, msg := range comments {
+		a[index] = msg
+		index++
+		if msg.New {
+			unread = append(unread, msg.FullID)
+		}
+	}
+
+	if len(unread) > 0 {
+		go func() {
+			//_, err = client.Message.Read(context.Background(), unread...)
+			if err != nil {
+				fmt.Println("Marking unread err: ", err.Error())
+			} else {
+				fmt.Println("Successfully marked ", len(unread), " messages as read.")
+			}
+		}()
+	}
+	if len(messages) > 0 && len(comments) > 0 {
+		// sort here
+	}
+	type MessagesWrapper struct {
+		After     string
+		Page      string
+		PageTitle string
+		Sorting   string
+		Items     []*reddit.Message
+	}
+	page := "unread"
+	wm := &MessagesWrapper{
+		After:     c.QueryParam("after"),
+		Page:      page, // <- fix
+		PageTitle: "messages: " + page,
+		Sorting:   "",
+		Items:     a,
+	}
+	err = tpls["messages"].Execute(c.Response(), wm)
 	return err
 }
 func frontpage(c echo.Context) error {

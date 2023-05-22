@@ -1,10 +1,9 @@
 name: goreleaser
 
-on:
-  push:
-    # run only against tags
-    tags:
-      - '*'
+on: push
+  #push:
+    #tags:
+      #- '*'
 
 permissions:
   contents: write
