@@ -462,10 +462,10 @@ func checkUnread(c echo.Context) error {
 	if config.EcoMode {
 		return c.NoContent(http.StatusNoContent)
 	}
-	oneItem := &reddit.MessageListOptions{
-		Mark: false,
+	oneItem := &reddit.ListOptions{
+		Limit: 1,
 	}
-	oneItem.Limit = 1
+
 	ms, cs, _, err := client.Message.InboxUnread(c.Request().Context(), oneItem)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, err)
@@ -652,7 +652,7 @@ func getSubreddit(c echo.Context, sub, after, sorting string, fp bool, tpl strin
 	return err
 }
 func inboxUnread(c echo.Context) error {
-	l := &reddit.MessageListOptions{
+	l := &reddit.ListOptions{
 
 		//Mark: true, //useless
 	}
