@@ -1,6 +1,6 @@
 {
-  "product": "compactbro",
-  "company": "testcomp",
+  "product": "CompactBro",
+  "company": "RDTMaster",
   "upgrade-code": "9914da44-8b72-4b3c-bfb3-404f09a6f999",
   "files": {
     "guid": "93e83360-3c73-428f-adf7-9803f2713980",
@@ -33,7 +33,7 @@
       {
         "name": "compactbro",
         "description": "CompactBRO reddit client",
-        "target": "[INSTALLDIR]\\testsetup.exe",
+        "target": "[INSTALLDIR]\\compactbro.exe",
         "wdir": "INSTALLDIR",
         "arguments": "",
         "icon": ""
