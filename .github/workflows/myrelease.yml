@@ -1,0 +1,108 @@
+name: myrelease
+
+on: 
+  push:
+    branches:
+
+env:
+  BIN: compactbro
+  EXTRAFILES: ./compactbro.sample.toml certs/ static/ templates/
+permissions: write-all
+
+jobs:
+     
+  myrelease:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      - run: git fetch --force --tags
+      - name: install go-msi
+        run: choco install go-msi
+      - name: get the version
+        id: curver
+        run: |
+          $v = $(git for-each-ref --sort=-creatordate --count 1 --format="%(refname:short)" "refs/tags/v*")
+          echo "ver=$(echo $v)" >> $env:GITHUB_OUTPUT
+      - name: bump semver
+        uses: actions-ecosystem/action-bump-semver@v1
+        id: bumpver
+        with:
+          current_version: ${{ steps.curver.outputs.ver }}
+          level: patch
+      - name: build-win-amd64
+        run: go build -v -o bin/win64/${{env.BIN}}.exe
+      - name: build-win32
+        run: |
+          $env:GOARCH="386"
+          go build -v -o bin/win32/${{env.BIN}}.exe
+
+      - name: pack windows builds
+        run: |
+          7z a ${{env.BIN}}-${{ steps.bumpver.outputs.new_version }}-windows-amd64.zip "./bin/win64/${{env.BIN}}.exe" ${{env.EXTRAFILES}}
+          7z a ${{env.BIN}}-${{ steps.bumpver.outputs.new_version }}-windows-x86.zip "./bin/win32/${{env.BIN}}.exe" ${{env.EXTRAFILES}}
+      - name: build MSIs
+        run: |
+          $env:Path += ";C:\Program Files\go-msi;C:\Program Files (x86)\WiX Toolset v3.11\bin"
+          $env:TMP = "${{ runner.temp }}"
+          $env:Tempdir = "${{ runner.temp }}"
+          go-msi.exe make -p wix64.json -a amd64 --msi ${{env.BIN}}-${{ steps.bumpver.outputs.new_version }}-setup-amd64.msi --version 1.0.2
+          go-msi.exe make -p wix86.json -a 386 --msi ${{env.BIN}}-${{ steps.bumpver.outputs.new_version }}-setup-x86.msi --version 1.0.2
+      - name: mass build
+        run: |
+          $targets=@(
+          [pscustomobject]@{GOOS="windows";GOARCH="arm64"},
+          [pscustomobject]@{GOOS="android";GOARCH="arm64"},
+          [pscustomobject]@{GOOS="android";GOARCH="arm"},
+          [pscustomobject]@{GOOS="ios";GOARCH="arm64"},
+          [pscustomobject]@{GOOS="ios";GOARCH="amd64"},
+          [pscustomobject]@{GOOS="linux";GOARCH="amd64"},
+          [pscustomobject]@{GOOS="linux";GOARCH="386"},
+          [pscustomobject]@{GOOS="linux";GOARCH="mips"},
+          [pscustomobject]@{GOOS="linux";GOARCH="mips64"},
+          [pscustomobject]@{GOOS="linux";GOARCH="mipsle"},
+          [pscustomobject]@{GOOS="darwin";GOARCH="arm64"},
+          [pscustomobject]@{GOOS="darwin";GOARCH="amd64"},
+          [pscustomobject]@{GOOS="freebsd";GOARCH="386"},
+          [pscustomobject]@{GOOS="freebsd";GOARCH="amd64"},
+          [pscustomobject]@{GOOS="solaris";GOARCH="amd64"}
+          )
+          foreach ($target in $targets){
+          echo "=== Building $(echo $target) ==="
+          $env:GOOS=$target.GOOS
+          $env:GOARCH=$target.GOARCH
+          go build -v -o bin/$(echo $target.GOOS)-$(echo $target.GOARCH)/${{env.BIN}}
+          7z a ${{env.BIN}}-${{ steps.bumpver.outputs.new_version }}-$(echo $target.GOOS)-$(echo $target.GOARCH).zip ./bin/$(echo $target.GOOS)-$(echo $target.GOARCH)/${{env.BIN}} ${{env.EXTRAFILES}}
+          }
+      
+      - name: push the tag
+        env: 
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          git tag ${{ steps.bumpver.outputs.new_version }}
+          git push --tags
+      - name: Create release
+        uses: softprops/action-gh-release@v1
+        #if: startsWith(github.ref, 'refs/tags/')
+        with:
+          tag_name: ${{ steps.bumpver.outputs.new_version }}
+          files: |
+            ${{env.BIN}}-${{ steps.bumpver.outputs.new_version }}-windows-amd64.zip
+            ${{env.BIN}}-${{ steps.bumpver.outputs.new_version }}-windows-x86.zip
+            ${{env.BIN}}-${{ steps.bumpver.outputs.new_version }}-setup-x86.msi
+            ${{env.BIN}}-${{ steps.bumpver.outputs.new_version }}-setup-amd64.msi
+            ${{env.BIN}}-${{ steps.bumpver.outputs.new_version }}-android-arm64.zip
+            ${{env.BIN}}-${{ steps.bumpver.outputs.new_version }}-android-arm.zip
+            ${{env.BIN}}-${{ steps.bumpver.outputs.new_version }}-ios-amd64.zip
+            ${{env.BIN}}-${{ steps.bumpver.outputs.new_version }}-ios-arm64.zip
+            ${{env.BIN}}-${{ steps.bumpver.outputs.new_version }}-linux-amd64.zip
+            ${{env.BIN}}-${{ steps.bumpver.outputs.new_version }}-linux-386.zip
+            ${{env.BIN}}-${{ steps.bumpver.outputs.new_version }}-linux-mipsle.zip
+            ${{env.BIN}}-${{ steps.bumpver.outputs.new_version }}-linux-mips64.zip
+            ${{env.BIN}}-${{ steps.bumpver.outputs.new_version }}-linux-mips.zip
+            ${{env.BIN}}-${{ steps.bumpver.outputs.new_version }}-darwin-amd64.zip
+            ${{env.BIN}}-${{ steps.bumpver.outputs.new_version }}-darwin-arm64.zip
+            ${{env.BIN}}-${{ steps.bumpver.outputs.new_version }}-freebsd-amd64.zip
+            ${{env.BIN}}-${{ steps.bumpver.outputs.new_version }}-freebsd-386.zip
+            ${{env.BIN}}-${{ steps.bumpver.outputs.new_version }}-solaris-amd64.zip

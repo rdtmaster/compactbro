@@ -1,0 +1,49 @@
+{
+  "product": "compactbro",
+  "company": "testcomp",
+  "upgrade-code": "9914da44-8b72-4b3c-bfb3-404f09a6f999",
+  "files": {
+    "guid": "93e83360-3c73-428f-adf7-9803f2713980",
+    "items": [
+      "bin/win64/compactbro.exe",
+      "compactbro.sample.toml"
+    ]
+  },
+  "directories": [
+    "certs",
+    "static",
+    "templates"
+  ],
+  "env": {
+    "guid": "4d5543f3-b434-44a8-b0db-32eee248ab76",
+    "vars": [
+      {
+        "name": "PATH",
+        "value": "[INSTALLDIR]",
+        "permanent": "yes",
+        "system": "yes",
+        "action": "set",
+        "part": "last"
+      }
+    ]
+  },
+  "shortcuts": {
+    "guid": "2e1d8cec-d6ed-42e6-9cec-d32cdeba6a32",
+    "items": [
+      {
+        "name": "compactbro",
+        "description": "CompactBRO reddit client",
+        "target": "[INSTALLDIR]\\testsetup.exe",
+        "wdir": "INSTALLDIR",
+        "arguments": "",
+        "icon": ""
+      }
+    ]
+  },
+  "choco": {
+    "description": "CompactBRO reddit client",
+    "project-url": "https://github.com/rdtmaster/compactbro",
+    "tags": "reddit compact web",
+    "license-url": "https://github.com/rdtmaster/compactbro/blob/master/LICENSE"
+  }
+}
