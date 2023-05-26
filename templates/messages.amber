@@ -1,6 +1,29 @@
 extends header
 block subtoolbar
-	none
+	div.subtoolbar
+		ul.tabmenu
+			li
+				.selected?$.Page == "all"
+				a.choice[href="/message/inbox/"] all
+			li
+				.selected?$.Page == "unread"
+				a.choice[href="/message/unread/"] unread
+			li
+				.selected?$.Page == "messages"
+				a.choice[href="/message/messages/"] messages
+			li
+				.selected?$.Page == "comments"
+				a.choice[href="/message/comments/"] comment replies
+			li
+				.selected?$.Page == "selfreply"
+				a.choice[href="/message/selfreply/"] post replies
+			li
+				.selected?$.Page == "mentions"
+				a.choice[href="/message/mentions/"] username mentions
 block content
 	div#siteTable.sitetable.messagelisting
 		import messages_pt
+	script
+		sorting = '';
+		moreURL = baseURL+'/pt/message/#{$.Page}/';
+		window.addEventListener('scroll', scrolling);

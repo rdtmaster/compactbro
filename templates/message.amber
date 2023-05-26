@@ -3,7 +3,7 @@ mixin message($m)
 	div
 		.thing
 		.message
-		.was_comment?$m.IsComment
+		.comment?$m.IsComment
 		.unread?$m.New
 		if $m.IsComment
 			+midcol2($likes)

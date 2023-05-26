@@ -409,7 +409,9 @@ func main() {
 	// Routes
 	server.GET("/stop*", shutdown)
 	server.GET("/", frontpage)
-	server.GET("/messages/", inboxUnread)
+	server.GET("/message/", messageInbox)
+	server.GET("/message/:page/", messageInbox)
+	server.GET("/pt/message/:page/", messageInboxPT)
 	server.GET("/pt/", frontpagePT)
 	server.GET("/r/:sub", subDefault)
 	server.GET("/r/:sub/", subDefault)
@@ -651,14 +653,36 @@ func getSubreddit(c echo.Context, sub, after, sorting string, fp bool, tpl strin
 	fmt.Println("--------")
 	return err
 }
-func inboxUnread(c echo.Context) error {
+func getMessages(c echo.Context, page, after, tpl string) error {
 	l := &reddit.ListOptions{
-
-		//Mark: true, //useless
+		After: after,
+		Limit: config.DefaultLimit,
 	}
-	l.Limit = 8
-	comments, messages, _, err := client.Message.InboxUnread(c.Request().Context(), l)
 
+	var page_ string
+	if len(page) > 0 {
+		page_ = page
+	} else {
+		page_ = "all"
+	}
+	var f func(context.Context, *reddit.ListOptions) ([]*reddit.Message, []*reddit.Message, *reddit.Response, error)
+	switch page_ {
+	case "all":
+		f = client.Message.Inbox
+	case "unread":
+		f = client.Message.InboxUnread
+	case "comments":
+		f = client.Message.InboxComments
+	case "selfreply":
+		f = client.Message.InboxSelfReplies
+	case "mentions":
+		f = client.Message.InboxMentions
+	case "messages":
+		f = client.Message.InboxMessages
+	default:
+		f = client.Message.Inbox
+	}
+	comments, messages, resp, err := f(c.Request().Context(), l)
 	fmt.Println("=====messages======")
 	unread := make([]string, 0)
 	a := make([]*reddit.Message, len(messages)+len(comments))
@@ -689,8 +713,11 @@ func inboxUnread(c echo.Context) error {
 		}()
 	}
 	if len(messages) > 0 && len(comments) > 0 {
-		// sort here
+		sort.Slice(a, func(i, j int) bool {
+			return a[j].Created.Time.Before(a[i].Created.Time)
+		})
 	}
+
 	type MessagesWrapper struct {
 		After     string
 		Page      string
@@ -698,16 +725,30 @@ func inboxUnread(c echo.Context) error {
 		Sorting   string
 		Items     []*reddit.Message
 	}
-	page := "unread"
+
 	wm := &MessagesWrapper{
-		After:     c.QueryParam("after"),
-		Page:      page, // <- fix
+		After:     resp.After,
+		Page:      page_,
 		PageTitle: "messages: " + page,
 		Sorting:   "",
 		Items:     a,
 	}
-	err = tpls["messages"].Execute(c.Response(), wm)
+	err = tpls[tpl].Execute(c.Response(), wm)
 	return err
+}
+func messageInbox(c echo.Context) error {
+	return getMessages(c,
+		c.Param("page"),
+		c.QueryParam("after"),
+		"messages")
+
+}
+func messageInboxPT(c echo.Context) error {
+	return getMessages(c,
+		c.Param("page"),
+		c.QueryParam("after"),
+		"messages_pt")
+
 }
 func frontpage(c echo.Context) error {
 	return getSubreddit(c,
