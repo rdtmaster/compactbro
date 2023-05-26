@@ -72,7 +72,7 @@ jobs:
           echo "=== Building $(echo $target) ==="
           $env:GOOS=$target.GOOS
           $env:GOARCH=$target.GOARCH
-          go build -v -o bin/$(echo $target.GOOS)-$(echo $target.GOARCH)/${{env.BIN}}
+          go build -o bin/$(echo $target.GOOS)-$(echo $target.GOARCH)/${{env.BIN}}
           7z a ${{env.BIN}}-${{ steps.bumpver.outputs.new_version }}-$(echo $target.GOOS)-$(echo $target.GOARCH).zip ./bin/$(echo $target.GOOS)-$(echo $target.GOARCH)/${{env.BIN}} ${{env.EXTRAFILES}}
           }
       
