@@ -310,8 +310,16 @@ function scrolling(){
 }
 function docOnLoad(){
 	backgroundUnread();
-	
-	
+	const collapsed = document.getElementsByClassName('collapsed');
+	for (comment of collapsed){
+		comment.title = 'Double click to show';
+		comment.addEventListener('dblclick', e => {
+			const ccl = comment.classList;
+			ccl.remove('collapsed');
+			e.removeEventListener();
+		});
+	}
+
 }
 
 document.addEventListener("DOMContentLoaded", docOnLoad);
