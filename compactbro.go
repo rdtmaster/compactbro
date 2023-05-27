@@ -181,9 +181,10 @@ func emoji(f reddit.RichFlair) template.HTML {
 
 }
 func getThumb(preview reddit.RedditPreview) string {
-	if len(preview.Images) == 0 {
+	if len(preview.Images) <= 0 || len(preview.Images[0].Resolutions) <= 0 {
 		return ""
 	}
+
 	return html.UnescapeString(preview.Images[0].Resolutions[0].URL)
 
 }

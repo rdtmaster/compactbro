@@ -26,8 +26,8 @@ mixin link($p, $ptt)
 					.flaircolorlight? $p.LinkFlairColor == "light"
 					.noshadow?strNotEmpty($p.LinkFlairBackground) && $p.LinkFlairBackground != "transparent"
 					[style="background: "+$p.LinkFlairBackground]? strNotEmpty($p.LinkFlairBackground) && $p.LinkFlairBackground != "transparent"
-					[title=$p.LinkFlairText]
-					|#{$p.LinkFlairText}
+					[title=unescaped($p.LinkFlairText)]
+					|#{unescaped($p.LinkFlairText)}
 			p.title
 				if $p.IsSelfPost
 					a.may-blank[title=unescaped($p.Title)][href=$p.Permalink] #{unescaped($p.Title)}

@@ -5,8 +5,8 @@ mixin textflair($fbc, $ftc, $text)
 		.flaircolorlight? $ftc == "light"
 		.noshadow? strNotEmpty($fbc) && $fbc != "transparent"
 		[style="background: "+$fbc]? strNotEmpty($fbc)  && $fbc != "transparent"
-		[title=$text]
-		|#{$text}
+		[title=unescaped($text)]
+		|#{unescaped($text)}
 
 mixin authorFlair($flairs, $flairtext, $fbc, $ftc)
 	if strNotEmpty($flairtext) || len($flairs)>0
