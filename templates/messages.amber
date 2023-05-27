@@ -20,9 +20,13 @@ block subtoolbar
 			li
 				.selected?$.Page == "mentions"
 				a.choice[href="/message/mentions/"] username mentions
+			li
+				.selected?$.Page == "sent"
+				a.choice[href="/message/sent/"] sent
 block content
 	div#siteTable.sitetable.messagelisting
 		import messages_pt
+	div.hidden#msgTrigger
 	script
 		sorting = '';
 		moreURL = baseURL+'/pt/message/#{$.Page}/';

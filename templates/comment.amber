@@ -49,10 +49,9 @@ mixin comment($c)
 				a[href="#"][onclick="return replyFormDisplay(this)"]
 					div.reply-icon
 					|Reply
-				if isMine($c.Author)
-					a[href="#"][onclick="unimpl()"]
-						div.context-icon
-						|Context
+				a[href=$c.Context]
+					div.context-icon
+					|Context
 				a[href=$c.Permalink]
 					div.permalink-icon
 					|Permalink
@@ -62,17 +61,18 @@ mixin comment($c)
 				a[href="#"][onclick="return editFormDisplay(this)"]
 					div.edit-icon
 					|Edit
-		div.child.commentreply.hidden
-				div.thing.comment
-					form.usertext[action="#"][onsubmit="return submitComment(this);"]
-						input[name="thing_id"][value=$c.FullID][type="hidden"]
-						textarea[name="text"][cols=1][rows=1]
-						div.bottom-area
-							strong
-								span.error.hidden
-							div.usertext-buttons
-								button.save.newbutton[type="submit"] Reply
-							div[style="clear:both"]
+				
+			
+		
+		form.hidden.usertext[action="#"][onsubmit="return submitComment(this);"]
+			input[name="thing_id"][value=$c.FullID][type="hidden"]
+			textarea.replytext[name="text"][cols=1][rows=1]
+			div.bottom-area
+				strong
+					span.error.hidden
+				div.usertext-buttons
+					button.save.newbutton[type="submit"] Reply
+				div[style="clear:both"]
 		div.commentspacer
 		if hasReplies($c)
 			div.child

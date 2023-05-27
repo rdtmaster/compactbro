@@ -32,8 +32,7 @@ html
 					#mail
 					.topbar-options
 					.nohavemail
-					[href="#"]
-					[onclick="return unimpl();"]
+					[href="/message/all/"]
 				a#topmenu_toggle.topbar-options[href="#"][onclick="return togTopMenu()"]
 			div#top_menu.hidden
 				div.menuitem

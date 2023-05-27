@@ -122,17 +122,19 @@ CRTPath = "/certs/certificate.pem"
 You will need to "Add security exception" when visiting https://i.reddit.com for the first time. During these operations you will see a lot of security here-be-dragons-like warnings. In general it is safe to ignore them since you are dealing with certificates you just signed yourself, but note that you do everything at your own risk.
 
 ## V1 roadmap
-- [x] View subs
+- [x] Front page
+- [x] View a subreddit
 - [x] View Posts+comments
 - [x] Edit posts
 - [x] Edit comments
-- [ ] Handle more comments
+- [ ] Handle more comments (partially complete)
 - [x] Comment under post and reply to comments
 - [ ] Delete comment
 - [ ] Delete post
-- [ ] Infinite scrolling subreddit and user overview page (1/2 complete)
-- [x] Check inbox and display orange icon
-- [ ] View messages
+- [x] Infinite scrolling subreddit, DMs and user overview page
+- [x] Check inbox and display orange icon, add config option to turn it on/off
+- [x] View messages (DMs, comment replies, post replies, username mentions, sent)
+- [x] Auto mark viewed as read (option to disable this in config)
 - [x] User overview
 - [x] Coloreful post/comment flairs
 - [x] User attrs (submitter, mod, admin)
@@ -145,9 +147,9 @@ You will need to "Add security exception" when visiting https://i.reddit.com for
 - [ ] Submit new post
 - [ ] Create sub
 - [ ] Open video links
-- [ ] Moderation
+- [ ] Moderation and modmail
 - [ ] Caching
-- [ ] night mode
+- [ ] night mode (placeholder and option created)
 - [ ] Use better template engine
 
 

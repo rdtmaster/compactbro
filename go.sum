@@ -38,6 +38,8 @@ github.com/rdtmaster/go-reddit/v4 v4.0.0-20230522104719-cfd0a02bead7 h1:QkgMFn9a
 github.com/rdtmaster/go-reddit/v4 v4.0.0-20230522104719-cfd0a02bead7/go.mod h1:920MWRBoSKCBfgq9x7xOpzYYogL2HpERI8bQjMuTbmA=
 github.com/rdtmaster/go-reddit/v4 v4.0.0-20230526184706-36a7cdd558ac h1:REXC2WgfI55DSFD28cijU131FTYaVjm8VA8DDlAl0ms=
 github.com/rdtmaster/go-reddit/v4 v4.0.0-20230526184706-36a7cdd558ac/go.mod h1:920MWRBoSKCBfgq9x7xOpzYYogL2HpERI8bQjMuTbmA=
+github.com/rdtmaster/go-reddit/v4 v4.0.0-20230527170130-4b5583f2bc94 h1:FCiSMDJ2I2xbJXFS7pWPHP23Xb6GSkfGjYM4FO93+AE=
+github.com/rdtmaster/go-reddit/v4 v4.0.0-20230527170130-4b5583f2bc94/go.mod h1:920MWRBoSKCBfgq9x7xOpzYYogL2HpERI8bQjMuTbmA=
 github.com/stretchr/objx v0.1.0/go.mod h1:HFkY916IF+rwdDfMAkV7OtwuqBVzrE8GR6GFx+wExME=
 github.com/stretchr/testify v1.5.1/go.mod h1:5W2xD1RspED5o8YsWQXVCued0rvSQ+mT+I5cxcmMvtA=
 github.com/stretchr/testify v1.7.0/go.mod h1:6Fq8oRcR53rry900zMqJjRRixrwX3KX962/h/Wwjteg=

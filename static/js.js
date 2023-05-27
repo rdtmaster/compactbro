@@ -27,9 +27,14 @@ function togTopMenu(){
 }
 
 function backgroundUnread(){
+	if (document.getElementById('msgTrigger')){
+		return;
+	}
 	fetch(baseURL+'/checkunread/', {method: 'HEAD'}).then(r =>{
 		if (r.status === 200){
-			const mailcl = document.getElementById('mail').classList;
+			const mail = document.getElementById('mail');
+			const mailcl = mail.classList;
+			mail.href='/message/unread/';
 			mailcl.remove('nohavemail');
 			mailcl.add('havemail');
 		}
@@ -83,28 +88,31 @@ function editFormDisplay(that){
 	togDisplay(uf.getElementsByClassName('usertext-edit')[0]);
 	return false;
 }
-function replyFormDisplay(that){
-	const cr = that.parentNode.parentNode.parentNode
-		.getElementsByClassName('commentreply')[0];
-	togDisplay(cr);
-	const list = cr.getElementsByClassName('comment')[0].getElementsByClassName('usertext')[0].childNodes
-	for (e of list){
-		if (e.name === 'text'){
-			const strs = window.getSelection().toString().split("\r\n\r\n");
-			const ln = strs.length - 1;
-			for (var i = 0;i < ln+1;i++) {
-				e.value += '> '+strs[i].trim();
-				if (i < ln){
-					e.value += "\r\n\r\n";
-				}
-			}
-			break;
+function appendSelected(replytext){
+	const strs = window.getSelection().toString().split("\r\n\r\n");
+	for (str of strs) {
+		if (str && str.length>0){
+			console.log(replytext);
+			replytext.value += '> '+str.trim();
+			replytext.value += "\r\n\r\n";
 		}
 	}
+}
+
+function replyFormDisplay(that){
+	const crf = that.parentNode.parentNode.parentNode.getElementsByClassName('usertext')[1];
+	
+	togDisplay(crf);
+	appendSelected(crf.getElementsByClassName('replytext')[0]);
 	return false;
 }
 
-
+function msgReplyFormDisplay(that){
+	const mrf = that.parentNode.parentNode.getElementsByClassName('usertext')[0];
+	console.log(mrf);
+	togDisplay(mrf);
+	return false;
+}
 
 function postBodyDisplay(that){
 	const thing = that.parentNode.parentNode;
@@ -195,22 +203,28 @@ function submitComment(pf){
 	const json = form2json(pf);
 	const errDisplay = pf.getElementsByClassName('error')[0];
 	errDisplay.textContent ='Loading...';
-	pst('/comment',json)
+	pst('/comment/',json)
 		.then(r => {
 			if (r.status === 200) {
 				errDisplay.textContent ='';
 				pf.getElementsByTagName('textarea')[0].value='';
 				r.text().then(t => {
 					const par = pf.parentNode;
-					const isRoot = !par.classList.contains('comment');
-					if (isRoot){
+					console.log(par);
+					const pcl = par.classList;
+					if (pcl.contains('commentarea')){
 					document.getElementsByClassName('nestedlisting')[0]
 						.insertAdjacentHTML('afterbegin',t);
-					} else {
+					} else if(pcl.contains('comment')||pcl.contains('was_comment')){
 						const child = document.createElement('div');
 						child.classList.add('child');
 						child.innerHTML = t;
 						par.appendChild(child);
+						togDisplay(pf);
+					} else if (pcl.contains('was_comment')){
+						
+					} else {
+						//reply to dm
 					}
 					
 				});

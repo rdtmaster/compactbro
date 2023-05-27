@@ -64,12 +64,14 @@ type voteResult struct {
 	Thing_id  string `json:"thing_id"`
 }
 type CompactConfig struct {
-	EcoMode            bool
-	NightMode          bool
-	DisplayFlairEmojis bool
-	DefaultLimit       int
-	LocalAddress       string
-	HTTPS              struct {
+	EcoMode              bool
+	NightMode            bool
+	DisplayFlairEmojis   bool
+	DefaultLimit         int
+	LocalAddress         string
+	MarkMsgsUnreadOnView bool
+	CheckMsgs            bool
+	HTTPS                struct {
 		Use          bool
 		LocalAddress string
 		KeyPath      string
@@ -88,6 +90,10 @@ type CompactConfig struct {
 var config CompactConfig
 var server *echo.Echo
 
+func sentWrapped(ctx context.Context, opts *reddit.ListOptions) ([]*reddit.Message, []*reddit.Message, *reddit.Response, error) {
+	messages, resp, err := client.Message.Sent(ctx, opts)
+	return messages, nil, resp, err
+}
 func cleanCommentID(id string) (cleanID string) {
 	cleanID, _ = strings.CutPrefix(id, kindComment+"_")
 	return
@@ -427,7 +433,7 @@ func main() {
 	server.GET("/u/:username/:page/", overview)
 	server.GET("/pt/u/:username/:page/", overviewPT)
 	server.POST("/edit/", editThing)
-	server.POST("/comment*", submitComment)
+	server.POST("/comment/", submitComment)
 	server.GET("/vote/:direction/:thing_id/", vote)
 	server.GET("/r/:sub/comments/:postID/:permalink/:commentID/", commentThread)
 
@@ -461,7 +467,7 @@ func shutdown(c echo.Context) error {
 }
 
 func checkUnread(c echo.Context) error {
-	if config.EcoMode {
+	if config.CheckMsgs {
 		return c.NoContent(http.StatusNoContent)
 	}
 	oneItem := &reddit.ListOptions{
@@ -679,6 +685,9 @@ func getMessages(c echo.Context, page, after, tpl string) error {
 		f = client.Message.InboxMentions
 	case "messages":
 		f = client.Message.InboxMessages
+	case "sent":
+		f = sentWrapped
+
 	default:
 		f = client.Message.Inbox
 	}
@@ -702,9 +711,9 @@ func getMessages(c echo.Context, page, after, tpl string) error {
 		}
 	}
 
-	if len(unread) > 0 {
+	if len(unread) > 0 && config.MarkMsgsUnreadOnView {
 		go func() {
-			//_, err = client.Message.Read(context.Background(), unread...)
+			_, err = client.Message.Read(context.Background(), unread...)
 			if err != nil {
 				fmt.Println("Marking unread err: ", err.Error())
 			} else {

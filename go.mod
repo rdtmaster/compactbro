@@ -7,7 +7,7 @@ require (
 	github.com/eknkc/amber v0.0.0-20171010120322-cdade1c07385
 	github.com/kirsle/configdir v0.0.0-20170128060238-e45d2f54772f
 	github.com/labstack/echo/v4 v4.10.3-0.20230512191429-8e425c04311c
-	github.com/rdtmaster/go-reddit/v4 v4.0.0-20230526184706-36a7cdd558ac
+	github.com/rdtmaster/go-reddit/v4 v4.0.0-20230527170130-4b5583f2bc94
 )
 
 require (
