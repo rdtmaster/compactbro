@@ -95,14 +95,14 @@ function appendSelected(replytext){
 			replytext.value += "\r\n\r\n";
 		}
 	}
+	replytext.focus();
 }
 
-function replyFormDisplay(that){
-	const crf = that.parentNode.parentNode.parentNode.getElementsByClassName('usertext')[1];
-	
+function replyFormDisplay(thing_id){
+	const crf = document.getElementById(thing_id).getElementsByClassName('usertext')[1];
 	togDisplay(crf);
 	appendSelected(crf.getElementsByClassName('replytext')[0]);
-	return false;
+	
 }
 
 function msgReplyFormDisplay(that){
@@ -335,11 +335,21 @@ function docOnLoad(){
 				editDisplay(thing_id);
 			});
 		}
+		
+		const replyButton = opts.getElementsByClassName('reply-icon')[0];
+		if (replyButton){
+			replyButton.parentNode.addEventListener('click', e => {
+				e.preventDefault();
+				replyFormDisplay(thing_id);
+			});
+		}
 		const shareButton = opts.getElementsByClassName('email-icon')[0];
 		shareButton.parentNode.addEventListener('click', e => {
 			e.preventDefault();
 			unimpl();
 		});
+		
+		
 		
 		//Up and downvote buttons
 		const midcol = thing.getElementsByClassName('midcol')[0];

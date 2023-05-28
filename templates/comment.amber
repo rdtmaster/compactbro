@@ -48,7 +48,7 @@ mixin comment($c)
 					a[href=cleanLink($c.PostPermalink)+cleanCommentID($c.ParentID)+"/"]
 						div.parent-icon
 						|Parent
-				a[href="#"][onclick="return replyFormDisplay(this)"]
+				a[href="#"]
 					div.reply-icon
 					|Reply
 				a[href=$c.Context]
@@ -57,9 +57,6 @@ mixin comment($c)
 				a[href=$c.Permalink]
 					div.permalink-icon
 					|Permalink
-				a[href="#"][onclick="return collapseComment(this)"]
-					div.collapse-icon
-					|Collapse
 				if isMine($c.Author)
 					a[href="#"]
 						div.edit-icon
