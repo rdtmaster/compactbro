@@ -1,10 +1,12 @@
 mixin comment($c)
 	$likes = likesInt($c.Likes)
 	div
+		[id=$c.FullID]
 		.thing
 		.comment
 		.collapsed?$c.Collapsed
-		[data-id=$c.FullID]
+		[ondblclick="togCollapsed(this)"]?$c.Collapsed
+		[title="double click to show collapsed comment"]?$c.Collapsed
 		+midcol1($likes)
 		div
 			.entry
@@ -58,9 +60,10 @@ mixin comment($c)
 				a[href="#"][onclick="return collapseComment(this)"]
 					div.collapse-icon
 					|Collapse
-				a[href="#"][onclick="return editFormDisplay(this)"]
-					div.edit-icon
-					|Edit
+				if isMine($c.Author)
+					a[href="#"][onclick="return editFormDisplay(this)"]
+						div.edit-icon
+						|Edit
 				
 			
 		

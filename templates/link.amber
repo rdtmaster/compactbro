@@ -5,7 +5,7 @@ mixin link($p, $ptt)
 		.thing
 		.link
 		.stickied ? $p.Stickied
-		[data-id=$p.FullID]
+		[id=$p.FullID]
 		span.rank
 		+midcol1($likes)
 		if $ptt == "0"

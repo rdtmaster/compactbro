@@ -4,14 +4,12 @@ mixin arrows($likes)
 		.up
 		.login-required
 		.upmod? $likes == 1
-		[onclick="return vote(this)"]
 		[role="button"]
 	div
 		.arrow
 		.down
 		.login-required
 		.downmod? $likes == -1
-		[onclick="return vote(this)"]
 		[role="button"]
 
 

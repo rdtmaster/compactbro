@@ -65,9 +65,8 @@ function isShown(elem){
 	return !isHidden(elem);
 }
 
-function optionsDisplay(that){
-	togDisplay(that.parentNode.getElementsByClassName('options_expando')[0]);
-	return false;
+function optionsDisplay(id){
+	togDisplay(document.getElementById(id).getElementsByClassName('options_expando')[0]);
 }
 
 function editDisplay(that){
@@ -160,20 +159,30 @@ function showErrors(status, errors, errDisplay){
 		errDisplay.innerHTML = s;
 }
 
-function collapseComment(that){
-	const comment = that.parentNode.parentNode.parentNode;
+function togCollapsed(comment){
+	
 	const ccl = comment.classList;
 	if (ccl.contains('collapsed')){
+		
 		ccl.remove('collapsed');
 		comment.title = '';
+		console.log(comment);
 	} else {
+		
 		ccl.add('collapsed');
 		comment.title = 'Double click to show';
 		comment.addEventListener('dblclick', e => {
-			collapseComment(that);
-			e.removeEventListener();
+			togCollapsed(comment);
+
 		});
 	}
+}
+
+function collapseComment(that){
+	const comment = that.parentNode.parentNode.parentNode;
+	comment.classList.add('collapsed');
+	comment.title = 'double click to show collapsed comment';
+	comment.addEventListener('dblclick', e => togCollapsed(comment));
 	return false;
 }
 
@@ -237,19 +246,10 @@ function submitComment(pf){
 		return false;
 }
 
-function vote(that){
-	const cl = that.classList
-	const midcol = that.parentNode;
-	const thing = midcol.parentNode;
-	var direction = '';
-	if (cl.contains('downmod') || cl.contains('upmod')){
-		direction ="remove";
-	} else if (cl.contains('up')){
-		direction = 'up';
-	} else if (cl.contains('down')){
-		direction = 'down';
-	}
-	get('/vote/'+direction+'/'+thing.dataset.id+'/').then(r => {
+function vote(id, direction){
+	const thing = document.getElementById(id);
+	const midcol = thing.getElementsByClassName('midcol')[0];
+	get('/vote/'+direction+'/'+id+'/').then(r => {
 		if (r.status === 200){
 			const arrows = midcol.getElementsByClassName('arrow');
 			const ecl = thing.getElementsByClassName('entry')[0].classList;
@@ -310,16 +310,51 @@ function scrolling(){
 }
 function docOnLoad(){
 	backgroundUnread();
-	const collapsed = document.getElementsByClassName('collapsed');
-	for (comment of collapsed){
-		comment.title = 'Double click to show';
-		comment.addEventListener('dblclick', e => {
-			const ccl = comment.classList;
-			ccl.remove('collapsed');
-			e.removeEventListener();
-		});
+	const things = document.getElementsByClassName('thing');
+	for (thing of things){
+		const thing_id = thing.id;
+		
+		//Expando options display button
+		const optionsLink = thing.getElementsByClassName('options_link')[0]
+		if (optionsLink){
+			optionsLink.addEventListener('click', e => {
+				e.preventDefault();
+				optionsDisplay(thing_id);
+			});
+		}
+		
+		//Up and downvote buttons
+		const midcol = thing.getElementsByClassName('midcol')[0];
+		if (midcol){
+			const up = midcol.getElementsByClassName('up')[0];
+			if (up.classList.contains('upmod')){
+				up.addEventListener('click', e => {
+					e.preventDefault();
+					vote(thing_id,'remove');
+				});
+			} else {
+				up.addEventListener('click', e => {
+					e.preventDefault();
+					vote(thing_id,'up');
+				});
+			}
+			
+			const down = midcol.getElementsByClassName('down')[0];
+			if (down.classList.contains('downmod')){
+				down.addEventListener('click', e => {
+					e.preventDefault();
+					vote(thing_id,'remove');
+				});
+			} else {
+				down.addEventListener('click', e => {
+					e.preventDefault();
+					vote(thing_id,'down');
+				});
+			}
+			
+		}
 	}
-
+	
 }
 
 document.addEventListener("DOMContentLoaded", docOnLoad);
