@@ -22,7 +22,7 @@ mixin comment($c)
 						+awardings($c.Awardings)
 					if $c.Stickied
 						span[style="float:right"].stickied-tagline[title="selected by this subreddit's moderators"] stickied comment
-			a.options_link[href="#"][onclick="return optionsDisplay(this)"]
+			a.options_link[href="#"]
 			form.usertext[action="#"][method="POST"][onsubmit="return editSubmit(this)"]
 				input[name="thing_id"][value=$c.FullID][type="hidden"]
 				div.usertext-body#{html($c.Body_html)}
@@ -37,7 +37,7 @@ mixin comment($c)
 								button.newbutton[type="submit"] Delete comment
 						div[style="clear:both"]
 			div.clear.options_expando.hidden
-				a[href="#"][onclick="return unimpl()"]
+				a[href="#"]
 					div.email-icon
 					|Share
 				if isPostID($c.ParentID)
@@ -61,7 +61,7 @@ mixin comment($c)
 					div.collapse-icon
 					|Collapse
 				if isMine($c.Author)
-					a[href="#"][onclick="return editFormDisplay(this)"]
+					a[href="#"]
 						div.edit-icon
 						|Edit
 				

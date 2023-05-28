@@ -69,24 +69,23 @@ function optionsDisplay(id){
 	togDisplay(document.getElementById(id).getElementsByClassName('options_expando')[0]);
 }
 
-function editDisplay(that){
-	const thing = that.parentNode.parentNode;
-	const expando = thing.getElementsByClassName('expando')[0];
-	
-	if (isHidden(expando)){
-		show(expando);
+function editDisplay(id){
+	const thing = document.getElementById(id);
+	const tcl = thing.classList;
+	if (tcl.contains('link')){
+		const expando = thing.getElementsByClassName('expando')[0];
+		if (isHidden(expando)){
+			show(expando);
+		}
+		togDisplay(expando.getElementsByClassName('usertext-edit')[0]);
+		togDisplay(expando.getElementsByClassName('usertext-body')[0]);
+	} else if (tcl.contains('comment')){
+		const uf = thing.getElementsByClassName('entry')[0].getElementsByClassName('usertext')[0];
+		togDisplay(uf.getElementsByClassName('md')[0]);
+		togDisplay(uf.getElementsByClassName('usertext-edit')[0]);
 	}
-	togDisplay(expando.getElementsByClassName('usertext-edit')[0]);
-	togDisplay(expando.getElementsByClassName('usertext-body')[0]);
-	return false;
-	
 }
-function editFormDisplay(that){
-	const uf = that.parentNode.parentNode.getElementsByClassName('usertext')[0];
-	togDisplay(uf.getElementsByClassName('md')[0]);
-	togDisplay(uf.getElementsByClassName('usertext-edit')[0]);
-	return false;
-}
+
 function appendSelected(replytext){
 	const strs = window.getSelection().toString().split("\r\n\r\n");
 	for (str of strs) {
@@ -284,12 +283,15 @@ function vote(id, direction){
 }
 
 function scrolling(){
+	if (inProgress){
+		return;
+	}
 	const sTop = doc.scrollTop;
 	const sHeight = doc.scrollHeight;
 	const cHeight = doc.clientHeight;
 	const aftercontainers = document.getElementsByClassName('aftercontainer');
 	const after = aftercontainers[aftercontainers.length-1].value;
-	if (!inProgress && sTop + cHeight >= sHeight && after && after.length > 1){
+	if (sTop + cHeight >= sHeight && after && after.length > 1){
 		inProgress = true;
 		const loader = document.getElementById('loaderimg');
 		togDisplay(loader);
@@ -308,6 +310,7 @@ function scrolling(){
 		});
 	}
 }
+
 function docOnLoad(){
 	backgroundUnread();
 	const things = document.getElementsByClassName('thing');
@@ -322,6 +325,21 @@ function docOnLoad(){
 				optionsDisplay(thing_id);
 			});
 		}
+		
+		//icon expando buttons
+		const opts = thing.getElementsByClassName('options_expando')[0];
+		const editButton = opts.getElementsByClassName('edit-icon')[0];
+		if (editButton){
+			editButton.parentNode.addEventListener('click', e => {
+				e.preventDefault();
+				editDisplay(thing_id);
+			});
+		}
+		const shareButton = opts.getElementsByClassName('email-icon')[0];
+		shareButton.parentNode.addEventListener('click', e => {
+			e.preventDefault();
+			unimpl();
+		});
 		
 		//Up and downvote buttons
 		const midcol = thing.getElementsByClassName('midcol')[0];

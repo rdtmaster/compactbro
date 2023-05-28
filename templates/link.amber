@@ -58,7 +58,7 @@ mixin link($p, $ptt)
 					+awardings($p.Awardings)
 				if $p.Stickied && !$p.Pinned
 					span.stickied-tagline[title="announcement"]&nbsp;-&nbsp;announcement
-		a.options_link[href="#"][onclick="return optionsDisplay(this)"]
+		a.options_link[href="#"]
 		div.expando
 			.hidden?$ptt == "0"
 			form.usertext[action=""][method="POST"][onsubmit="return editSubmit(this)"]
@@ -72,10 +72,10 @@ mixin link($p, $ptt)
 						div.usertext-buttons
 							button.save.newbutton[type="submit"] Save
 		div.clear.options_expando.hidden
-			a[href="#"][onclick="unimpl()"]
+			a[href="#"]
 				div.email-icon
 				|Share
 			if isMine($p.Author)
-				a[href="#"][onclick="return editDisplay(this)"].editButton
+				a[href="#"]
 					div.edit-icon
 					|Edit
