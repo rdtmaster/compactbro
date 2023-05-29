@@ -30,6 +30,116 @@ function togDisplay(elem){
 		hide(elem);
 	}
 }
+
+function eventsOfContainer(container){
+	const things = container.getElementsByClassName('thing');
+	for (thing of things){
+		setEvents(thing);
+	}
+}
+
+// set events for a thing
+function setEvents(thing){
+	const thing_id = thing.id;
+	const usertext = thing.getElementsByClassName('usertext')[0];
+	if (usertext){
+		usertext.addEventListener('submit', e => {
+			e.preventDefault();
+			editSubmit(thing_id);
+		});
+	}
+	//Expando options display button
+	const optionsLink = thing.getElementsByClassName('options_link')[0]
+	if (optionsLink){
+		optionsLink.addEventListener('click', e => {
+			e.preventDefault();
+			optionsDisplay(thing_id);
+		});
+	}
+	
+	
+	if (thing.classList.contains('link')){
+		//Selftext expando
+		const exButton = thing.getElementsByClassName('expando-button')[0];
+		if (exButton){
+			exButton.addEventListener('click', e => {
+				e.preventDefault();
+				postBodyDisplay(thing_id);
+			});
+		}
+	}
+	
+	if (thing.classList.contains('comment')){
+		const ut = thing.getElementsByClassName('usertext')[1];
+		if (ut){
+			ut.addEventListener('submit', e => {
+			e.preventDefault();
+			submitComment(thing_id);
+		});
+		}
+		
+	}
+	//icon expando buttons
+	const opts = thing.getElementsByClassName('options_expando')[0];
+	const editButton = opts.getElementsByClassName('edit-icon')[0];
+	if (editButton){
+		editButton.parentNode.addEventListener('click', e => {
+			e.preventDefault();
+			editDisplay(thing_id);
+		});
+	}
+	
+	const replyButton = opts.getElementsByClassName('reply-icon')[0];
+	if (replyButton){
+		replyButton.parentNode.addEventListener('click', e => {
+			e.preventDefault();
+			replyFormDisplay(thing_id);
+		});
+	}
+	const shareButton = opts.getElementsByClassName('email-icon')[0];
+	shareButton.parentNode.addEventListener('click', e => {
+		e.preventDefault();
+		unimpl();
+	});
+	
+	
+	
+	//Up and downvote buttons
+	const midcol = thing.getElementsByClassName('midcol')[0];
+	if (midcol){
+		const up = midcol.getElementsByClassName('up')[0];
+		if (up.classList.contains('upmod')){
+			up.addEventListener('click', e => {
+				e.preventDefault();
+				vote(thing_id,'remove');
+			});
+		} else {
+			up.addEventListener('click', e => {
+				e.preventDefault();
+				vote(thing_id,'up');
+			});
+		}
+		
+		const down = midcol.getElementsByClassName('down')[0];
+		if (down.classList.contains('downmod')){
+			down.addEventListener('click', e => {
+				e.preventDefault();
+				vote(thing_id,'remove');
+			});
+		} else {
+			down.addEventListener('click', e => {
+				e.preventDefault();
+				vote(thing_id,'down');
+			});
+		}
+		
+	}
+}
+
+
+
+//------- Event Listeners -------
+
 function togTopMenu(){
 	togDisplay(document.getElementById('top_menu'));
 	return false;
@@ -208,13 +318,14 @@ function submitComment(id){
 				pf.getElementsByTagName('textarea')[0].value='';
 				r.text().then(t => {
 					const pcl = thing.classList;
+					const child = document.createElement('div');
+					child.innerHTML = t;
+					eventsOfContainer(child);
 					if (id === 'commentArea'){
-					document.getElementsByClassName('nestedlisting')[0]
-						.insertAdjacentHTML('afterbegin',t);
+						const listing = document.getElementsByClassName('nestedlisting')[0];
+						listing.insertBefore(child, listing.firstChild);
 					} else if(pcl.contains('comment')||pcl.contains('was_comment')){
-						const child = document.createElement('div');
 						child.classList.add('child');
-						child.innerHTML = t;
 						thing.appendChild(child);
 						togDisplay(pf);
 					} else if (pcl.contains('was_comment')){
@@ -287,9 +398,10 @@ function scrolling(){
 			hide(loader);
 			if (r.status === 200) {
 				r.text().then(t => {
-					console.log('here');
-					document.getElementById('siteTable')
-						.insertAdjacentHTML('beforeend', t);
+					const addition = document.createElement('div');
+					addition.innerHTML = t;
+					eventsOfContainer(addition);
+					document.getElementById('siteTable').appendChild(addition);
 				});
 			} else {
 				alert('Error fetching more data: '+r.status);
@@ -297,15 +409,11 @@ function scrolling(){
 		});
 	}
 }
-
 function docOnLoad(){
 	backgroundUnread();
-	const things = document.getElementsByClassName('thing');
 	commentarea = document.getElementById('commentArea');
 	if (commentarea){
-		console.log('carea ',commentarea);
 		ut = commentarea.getElementsByClassName('usertext')[1];
-		console.log('ut',ut);
 		if (ut){
 			ut.addEventListener('submit', e => {
 				e.preventDefault();
@@ -313,103 +421,7 @@ function docOnLoad(){
 			});
 		}
 	}
-	for (thing of things){
-		const thing_id = thing.id;
-		
-		const usertext = thing.getElementsByClassName('usertext')[0];
-		if (usertext){
-			usertext.addEventListener('submit', e => {
-				e.preventDefault();
-				editSubmit(thing_id);
-			});
-		}
-		//Expando options display button
-		const optionsLink = thing.getElementsByClassName('options_link')[0]
-		if (optionsLink){
-			optionsLink.addEventListener('click', e => {
-				e.preventDefault();
-				optionsDisplay(thing_id);
-			});
-		}
-		
-		
-		if (thing.classList.contains('link')){
-			//Selftext expando
-			const exButton = thing.getElementsByClassName('expando-button')[0];
-			if (exButton){
-				exButton.addEventListener('click', e => {
-					e.preventDefault();
-					postBodyDisplay(thing_id);
-				});
-			}
-		}
-		
-		if (thing.classList.contains('comment')){
-			const ut = thing.getElementsByClassName('usertext')[1];
-			if (ut){
-				ut.addEventListener('submit', e => {
-				e.preventDefault();
-				submitComment(thing_id);
-			});
-			}
-			
-		}
-		//icon expando buttons
-		const opts = thing.getElementsByClassName('options_expando')[0];
-		const editButton = opts.getElementsByClassName('edit-icon')[0];
-		if (editButton){
-			editButton.parentNode.addEventListener('click', e => {
-				e.preventDefault();
-				editDisplay(thing_id);
-			});
-		}
-		
-		const replyButton = opts.getElementsByClassName('reply-icon')[0];
-		if (replyButton){
-			replyButton.parentNode.addEventListener('click', e => {
-				e.preventDefault();
-				replyFormDisplay(thing_id);
-			});
-		}
-		const shareButton = opts.getElementsByClassName('email-icon')[0];
-		shareButton.parentNode.addEventListener('click', e => {
-			e.preventDefault();
-			unimpl();
-		});
-		
-		
-		
-		//Up and downvote buttons
-		const midcol = thing.getElementsByClassName('midcol')[0];
-		if (midcol){
-			const up = midcol.getElementsByClassName('up')[0];
-			if (up.classList.contains('upmod')){
-				up.addEventListener('click', e => {
-					e.preventDefault();
-					vote(thing_id,'remove');
-				});
-			} else {
-				up.addEventListener('click', e => {
-					e.preventDefault();
-					vote(thing_id,'up');
-				});
-			}
-			
-			const down = midcol.getElementsByClassName('down')[0];
-			if (down.classList.contains('downmod')){
-				down.addEventListener('click', e => {
-					e.preventDefault();
-					vote(thing_id,'remove');
-				});
-			} else {
-				down.addEventListener('click', e => {
-					e.preventDefault();
-					vote(thing_id,'down');
-				});
-			}
-			
-		}
-	}
+	eventsOfContainer(document);
 	
 }
 
