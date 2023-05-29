@@ -3,6 +3,15 @@ var moreURL = '';
 var sorting = '';
 var inProgress = false;
 const doc = document.documentElement;
+function form2json(form){
+	const fd = new FormData(form);
+	const data ={};
+	for (let [name, val] of fd) {
+		data[name] = val;
+	}
+	return JSON.stringify(data);
+}
+
 function unimpl(){
 	alert('Unimplemented!!!');
 	return false;
@@ -79,6 +88,14 @@ function editDisplay(id){
 		}
 		togDisplay(expando.getElementsByClassName('usertext-edit')[0]);
 		togDisplay(expando.getElementsByClassName('usertext-body')[0]);
+	const exButton = thing.getElementsByClassName('expando-button')[0]
+	if(exButton.classList.contains('expanded')){
+		exButton.classList.remove('expanded');
+		exButton.classList.add('collapsed');
+	} else {
+		exButton.classList.remove('collapsed');
+		exButton.classList.add('expanded');
+	}
 	} else if (tcl.contains('comment')){
 		const uf = thing.getElementsByClassName('entry')[0].getElementsByClassName('usertext')[0];
 		togDisplay(uf.getElementsByClassName('md')[0]);
@@ -112,11 +129,10 @@ function msgReplyFormDisplay(that){
 	return false;
 }
 
-function postBodyDisplay(that){
-	const thing = that.parentNode.parentNode;
+function postBodyDisplay(id){
+	const thing = document.getElementById(id);
 	const expando = thing.getElementsByClassName('expando')[0];
 	if (expando){
-		
 		const utEdit = expando.getElementsByClassName('usertext-edit')[0];
 		if (utEdit){
 			hide(utEdit);
@@ -126,27 +142,15 @@ function postBodyDisplay(that){
 			show(utBody);
 		}
 		togDisplay(expando);
-		
 	}	
-	
-	if(that.classList.contains('expanded')){
-		that.classList.remove('expanded');
-		that.classList.add('collapsed');
+	const exButton = thing.getElementsByClassName('expando-button')[0]
+	if(exButton.classList.contains('expanded')){
+		exButton.classList.remove('expanded');
+		exButton.classList.add('collapsed');
 	} else {
-		that.classList.remove('collapsed');
-		that.classList.add('expanded');
+		exButton.classList.remove('collapsed');
+		exButton.classList.add('expanded');
 	}
-	return false;
-	
-}
-
-function form2json(form){
-	const fd = new FormData(form);
-	const data ={};
-	for (let [name, val] of fd) {
-		data[name] = val;
-	}
-	return JSON.stringify(data);
 }
 
 function showErrors(status, errors, errDisplay){
@@ -326,6 +330,15 @@ function docOnLoad(){
 			});
 		}
 		
+		if (thing.classList.contains('link')){
+			const exButton = thing.getElementsByClassName('expando-button')[0];
+			if (exButton){
+				exButton.addEventListener('click', e => {
+					e.preventDefault();
+					postBodyDisplay(thing_id);
+				});
+			}
+		}
 		//icon expando buttons
 		const opts = thing.getElementsByClassName('options_expando')[0];
 		const editButton = opts.getElementsByClassName('edit-icon')[0];

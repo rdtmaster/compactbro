@@ -40,7 +40,7 @@ mixin link($p, $ptt)
 				if $p.Spoiler
 					acronym[title="Spoiler"].spoiler-warning SPOILER
 			if $ptt == "0"
-				a.expando-button.collapsed.selftext[href="#"][onclick="return postBodyDisplay(this)"]
+				a.expando-button.collapsed.selftext[href="#"]
 			div.tagline
 				span
 					+score($p.Score)
