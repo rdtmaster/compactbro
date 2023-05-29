@@ -33,7 +33,7 @@ html
 					.topbar-options
 					.nohavemail
 					[href="/message/all/"]
-				a#topmenu_toggle.topbar-options[href="#"][onclick="return togTopMenu()"]
+				a#topmenu_toggle.topbar-options[href="#"]
 			div#top_menu.hidden
 				div.menuitem
 					a[href="/stop/"] Stop

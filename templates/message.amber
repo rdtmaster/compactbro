@@ -32,29 +32,28 @@ mixin message($m)
 				|&nbsp;sent&nbsp;
 				time.live-timestamp[title=$m.Created]#{dateAgo($m.Created)}
 			div.usertext-body#{html($m.BodyHtml)}
-		a.options_link[href="#"][onclick="return optionsDisplay(this)"]
+		a.options_link[href="#"]
 		div.clear.options_expando.hidden
-			a[href="#"][onclick="return unimpl()"]
+			a[href="#"]
 				div.email-icon
 				|Share
-			a[href="#"][onclick="return unimpl()"]
+			a[href="#"]
 				div.parent-icon
 				|Parent
 			if $m.IsComment
-				a[href="#"][onclick="return msgReplyFormDisplay(this)"]
+				a[href="#"]
 					div.reply-icon
 					|Reply
-			else
-				a[href="#"][onclick="return unimpl()"]
-					div.reply-icon
-					|Reply
-
-		form.hidden.usertext[action="#"][onsubmit="return submitComment(this);"]
-			input[name="thing_id"][value=$m.FullID][type="hidden"]
-			textarea.replytext[name="text"][cols=1][rows=1]
-			div.bottom-area
-				strong
-					span.error.hidden
-				div.usertext-buttons
-					button.save.newbutton[type="submit"] Reply
-				div[style="clear:both"]
+							
+		if $m.IsComment
+			form.hidden.usertext
+				span this is a workaround and should be removed in future
+			form.hidden.usertext[action="#"]
+				input[name="thing_id"][value=$m.FullID][type="hidden"]
+				textarea.replytext[name="text"][cols=1][rows=1]
+				div.bottom-area
+					strong
+						span.error.hidden
+					div.usertext-buttons
+						button.save.newbutton[type="submit"] Reply
+					div[style="clear:both"]

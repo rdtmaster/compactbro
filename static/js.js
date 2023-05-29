@@ -140,11 +140,6 @@ function setEvents(thing){
 
 //------- Event Listeners -------
 
-function togTopMenu(){
-	togDisplay(document.getElementById('top_menu'));
-	return false;
-}
-
 function backgroundUnread(){
 	if (document.getElementById('msgTrigger')){
 		return;
@@ -234,12 +229,6 @@ function replyFormDisplay(thing_id){
 	
 }
 
-function msgReplyFormDisplay(that){
-	const mrf = that.parentNode.parentNode.getElementsByClassName('usertext')[0];
-	console.log(mrf);
-	togDisplay(mrf);
-	return false;
-}
 
 function postBodyDisplay(id){
 	const thing = document.getElementById(id);
@@ -272,6 +261,7 @@ function showErrors(status, errors, errDisplay){
 			s+='<br/>';
 		}
 		errDisplay.innerHTML = s;
+		show(errDisplay);
 }
 
 
@@ -288,10 +278,11 @@ function editSubmit(id){
 	const json = form2json(uf);
 	const errDisplay = uf.getElementsByClassName('error')[0];
 	errDisplay.textContent ='Loading...';
+	show(errDisplay);
 	pst('/edit/',json)
 		.then(r => r.json().then(j =>{
 			if (r.status === 200) {
-				errDisplay.textContent ='';
+				hide(errDisplay);
 				const tcl = uf.parentNode.parentNode.classList;
 				console.log(j);
 					uf.getElementsByClassName('usertext-body')[0].innerHTML = j.body;
@@ -411,7 +402,7 @@ function scrolling(){
 }
 function docOnLoad(){
 	backgroundUnread();
-	commentarea = document.getElementById('commentArea');
+	const commentarea = document.getElementById('commentArea');
 	if (commentarea){
 		ut = commentarea.getElementsByClassName('usertext')[1];
 		if (ut){
@@ -420,6 +411,13 @@ function docOnLoad(){
 				submitComment('commentArea');
 			});
 		}
+	}
+	const topMenuTog = document.getElementById('topmenu_toggle');
+	if (topMenuTog){
+		topMenuTog.addEventListener('click', e => {
+			e.preventDefault();
+			togDisplay(document.getElementById('top_menu'));
+		});
 	}
 	eventsOfContainer(document);
 	

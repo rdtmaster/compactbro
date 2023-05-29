@@ -468,7 +468,7 @@ func shutdown(c echo.Context) error {
 }
 
 func checkUnread(c echo.Context) error {
-	if config.CheckMsgs {
+	if !config.CheckMsgs {
 		return c.NoContent(http.StatusNoContent)
 	}
 	oneItem := &reddit.ListOptions{
