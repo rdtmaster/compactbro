@@ -89,13 +89,15 @@ function editDisplay(id){
 		togDisplay(expando.getElementsByClassName('usertext-edit')[0]);
 		togDisplay(expando.getElementsByClassName('usertext-body')[0]);
 	const exButton = thing.getElementsByClassName('expando-button')[0]
-	if(exButton.classList.contains('expanded')){
-		exButton.classList.remove('expanded');
-		exButton.classList.add('collapsed');
-	} else {
-		exButton.classList.remove('collapsed');
-		exButton.classList.add('expanded');
-	}
+	if (exButton){
+			if(exButton.classList.contains('expanded')){
+				exButton.classList.remove('expanded');
+				exButton.classList.add('collapsed');
+			} else {
+				exButton.classList.remove('collapsed');
+				exButton.classList.add('expanded');
+			}
+		}
 	} else if (tcl.contains('comment')){
 		const uf = thing.getElementsByClassName('entry')[0].getElementsByClassName('usertext')[0];
 		togDisplay(uf.getElementsByClassName('md')[0]);
@@ -162,24 +164,6 @@ function showErrors(status, errors, errDisplay){
 		errDisplay.innerHTML = s;
 }
 
-function togCollapsed(comment){
-	
-	const ccl = comment.classList;
-	if (ccl.contains('collapsed')){
-		
-		ccl.remove('collapsed');
-		comment.title = '';
-		console.log(comment);
-	} else {
-		
-		ccl.add('collapsed');
-		comment.title = 'Double click to show';
-		comment.addEventListener('dblclick', e => {
-			togCollapsed(comment);
-
-		});
-	}
-}
 
 function collapseComment(that){
 	const comment = that.parentNode.parentNode.parentNode;
@@ -189,7 +173,8 @@ function collapseComment(that){
 	return false;
 }
 
-function editSubmit(uf){
+function editSubmit(id){
+	const uf = document.getElementById(id).getElementsByClassName('usertext')[0];
 	const json = form2json(uf);
 	const errDisplay = uf.getElementsByClassName('error')[0];
 	errDisplay.textContent ='Loading...';
@@ -208,10 +193,11 @@ function editSubmit(uf){
 				showErrors(r.status, j.json.errors, errDisplay)
 			}
 		}));
-		return false;
 }
 
-function submitComment(pf){
+function submitComment(id){
+	const thing = document.getElementById(id);
+	const pf = thing.getElementsByClassName('usertext')[1];
 	const json = form2json(pf);
 	const errDisplay = pf.getElementsByClassName('error')[0];
 	errDisplay.textContent ='Loading...';
@@ -221,17 +207,15 @@ function submitComment(pf){
 				errDisplay.textContent ='';
 				pf.getElementsByTagName('textarea')[0].value='';
 				r.text().then(t => {
-					const par = pf.parentNode;
-					console.log(par);
-					const pcl = par.classList;
-					if (pcl.contains('commentarea')){
+					const pcl = thing.classList;
+					if (id === 'commentArea'){
 					document.getElementsByClassName('nestedlisting')[0]
 						.insertAdjacentHTML('afterbegin',t);
 					} else if(pcl.contains('comment')||pcl.contains('was_comment')){
 						const child = document.createElement('div');
 						child.classList.add('child');
 						child.innerHTML = t;
-						par.appendChild(child);
+						thing.appendChild(child);
 						togDisplay(pf);
 					} else if (pcl.contains('was_comment')){
 						
@@ -246,7 +230,6 @@ function submitComment(pf){
 				});
 			}
 		});
-		return false;
 }
 
 function vote(id, direction){
@@ -318,9 +301,28 @@ function scrolling(){
 function docOnLoad(){
 	backgroundUnread();
 	const things = document.getElementsByClassName('thing');
+	commentarea = document.getElementById('commentArea');
+	if (commentarea){
+		console.log('carea ',commentarea);
+		ut = commentarea.getElementsByClassName('usertext')[1];
+		console.log('ut',ut);
+		if (ut){
+			ut.addEventListener('submit', e => {
+				e.preventDefault();
+				submitComment('commentArea');
+			});
+		}
+	}
 	for (thing of things){
 		const thing_id = thing.id;
 		
+		const usertext = thing.getElementsByClassName('usertext')[0];
+		if (usertext){
+			usertext.addEventListener('submit', e => {
+				e.preventDefault();
+				editSubmit(thing_id);
+			});
+		}
 		//Expando options display button
 		const optionsLink = thing.getElementsByClassName('options_link')[0]
 		if (optionsLink){
@@ -330,7 +332,9 @@ function docOnLoad(){
 			});
 		}
 		
+		
 		if (thing.classList.contains('link')){
+			//Selftext expando
 			const exButton = thing.getElementsByClassName('expando-button')[0];
 			if (exButton){
 				exButton.addEventListener('click', e => {
@@ -338,6 +342,17 @@ function docOnLoad(){
 					postBodyDisplay(thing_id);
 				});
 			}
+		}
+		
+		if (thing.classList.contains('comment')){
+			const ut = thing.getElementsByClassName('usertext')[1];
+			if (ut){
+				ut.addEventListener('submit', e => {
+				e.preventDefault();
+				submitComment(thing_id);
+			});
+			}
+			
 		}
 		//icon expando buttons
 		const opts = thing.getElementsByClassName('options_expando')[0];

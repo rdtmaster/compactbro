@@ -61,7 +61,7 @@ mixin link($p, $ptt)
 		a.options_link[href="#"]
 		div.expando
 			.hidden?$ptt == "0"
-			form.usertext[action=""][method="POST"][onsubmit="return editSubmit(this)"]
+			form.usertext[action=""][method="POST"]
 				input[type="hidden"][name="thing_id"][value=$p.FullID]
 				div.usertext-body#{html($p.Selftext_html)}
 				if isMine($p.Author)

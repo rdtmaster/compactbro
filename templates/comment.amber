@@ -4,9 +4,6 @@ mixin comment($c)
 		[id=$c.FullID]
 		.thing
 		.comment
-		.collapsed?$c.Collapsed
-		[ondblclick="togCollapsed(this)"]?$c.Collapsed
-		[title="double click to show collapsed comment"]?$c.Collapsed
 		+midcol1($likes)
 		div
 			.entry
@@ -23,7 +20,7 @@ mixin comment($c)
 					if $c.Stickied
 						span[style="float:right"].stickied-tagline[title="selected by this subreddit's moderators"] stickied comment
 			a.options_link[href="#"]
-			form.usertext[action="#"][method="POST"][onsubmit="return editSubmit(this)"]
+			form.usertext[action="#"][method="POST"]
 				input[name="thing_id"][value=$c.FullID][type="hidden"]
 				div.usertext-body#{html($c.Body_html)}
 				if isMine($c.Author)
@@ -61,10 +58,7 @@ mixin comment($c)
 					a[href="#"]
 						div.edit-icon
 						|Edit
-				
-			
-		
-		form.hidden.usertext[action="#"][onsubmit="return submitComment(this);"]
+		form.hidden.usertext[action="#"]
 			input[name="thing_id"][value=$c.FullID][type="hidden"]
 			textarea.replytext[name="text"][cols=1][rows=1]
 			div.bottom-area

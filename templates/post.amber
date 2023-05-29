@@ -17,12 +17,14 @@ block content
 		import midcol
 		import link
 		+link($.WP, "1")
-		div.commentarea
+		div.commentarea#commentArea
 			div.panestack-title
 				span.title all #{$.WP.NumberOfComments} comments
 			if !$.Thread
 				div.menuarea.subtoolbar 
-				form.usertext.cloneable.warn-on-unload[onsubmit="return submitComment(this)"]
+				form.usertext.hidden
+					span this is a workaround and must be fixed in future
+				form.usertext.cloneable[method="POST"][action="#"]
 					input[type="hidden"][name="thing_id"][value=$.WP.FullID]
 					div.usertext-edit.md-container
 						div.md
