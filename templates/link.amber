@@ -6,7 +6,7 @@ mixin link($p, $ptt)
 		.link
 		.stickied ? $p.Stickied
 		[id=$p.FullID]
-		span.rank
+		span.rank 1
 		+midcol1($likes)
 		if $ptt == "0"
 			div.commentcount
@@ -47,7 +47,7 @@ mixin link($p, $ptt)
 					|&#32;Submitted&#32;
 					time.live-timestamp[title=$p.Created]#{dateAgo($p.Created)}
 				span
-					|&#32;by&#32;
+					|&#32;by 
 					+author($p.Author, getDistinguished($p.Distinguished,(2==1)))
 				if strNotEmpty($p.AuthorFlairText) || len($p.AuthorFlairRichtext)>0
 					+authorFlair($p.AuthorFlairRichtext, $p.AuthorFlairText, $p.AuthorFlairBackground, $p.AuthorFlairColor)
@@ -56,6 +56,8 @@ mixin link($p, $ptt)
 					a[href="/"+$p.SubredditNamePrefixed]#{$p.SubredditNamePrefixed}
 				if $p.TotalAwards > 0
 					+awardings($p.Awardings)
+				else
+					span.awardings-bar
 				if $p.Stickied && !$p.Pinned
 					span.stickied-tagline[title="announcement"]&nbsp;-&nbsp;announcement
 		a.options_link[href="#"]

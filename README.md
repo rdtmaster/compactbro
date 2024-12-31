@@ -1,4 +1,6 @@
 # CompactBro
+**Warning**: This software is yet to reach v1. Some functions are simply unimplemented; development started in spring of 2023, after reddit removed `/.compact` functionality, however once the use of `.i` and a relevant userscript has been discovered, this project has been immediately obendened (v0.83.0) and stood there until the end of 2024. In spring of 2024 the `.i` has been shut down by reddit as well, but since the author pretty much left reddit at that time it was barely noticed and no effort has been taken to develop the software and move it towards v1. Now I decided to release it as is, allowing to browse and make comments/replies.
+
 Miss the old reddit mobile web/compact/wap interface (`i.reddit.com`, `.compact`)? Worry not, CompactBro brings it back!
 
 1. Download & unzip a version for your platform -> https://github.com/rdtmaster/compactbro/releases/latest
@@ -29,7 +31,6 @@ I thought about it but there are several obstacles. One of the most ambitious go
 
 ## How to install
 Work in progress!
-**WARNING the software is not functional yet do not install it!**
 
 First, download binary for your operating system from the releases page.  Alternatively, clone this repo and build it (you need `git` and functional go >= 1.20.3 installation):
 ```bash
@@ -60,14 +61,6 @@ LineNumbers = true
 ```
 replace values in `<...>` with relevant data, do not include `<` and `>`
 
-Before describing the config process, let's summarize it to help you decide what you need and don't need depending on your goals.
-
-1. **Running `compactbro` locally, without replacing `i.reddit.com`**. No HTTPS and no Authentication
-2. **Running `compactbro` locally, replacing `i.reddit.com`**. No authentication, HTTPS enabled
-3. **Running `compactbro` on a remote server without replacing `i.reddit.com`**. Auth and optional (but recommended) HTTPS
-4. **Running `compactbro` on a remote server, replacing `i.reddit.com`**. Authentication+HTTPS.
-
-Read further to know what do these steps mean and, when you decide what kind of setup you want, this list will help you realize which steps are required.
 
 ### Auth
 Generally there are two strategies of using compactbro: run it locally or on a server. If the former, you don't need any authentication whatsoever, simply fire it up; but running it on a remote server can provide several advantages, namely you don't need to have any additional process launched on your device. A low-end Linux VPS server should suffice and, once you configure Authentication and HTTPS, you can make it a drop-in replacement for `i.reddit.com`.
@@ -87,28 +80,17 @@ Replace values in `<...>` with credentials of your choice; be advised these are 
 Today majority of websites and apps are overly secure, with HTTPS enforced everywhere. Most resources in fact do not need it. There's nothing wrong about using plain HTTP in most scenarios. Any half sain person understands that if you just want to read the news or even sh1tpost on reddit it should not involve cryptography (which introduces great overhead and a big number of errors). Well, at least not by default. Think twice prior to enabling HTTPS, chances are you don't need it.
 However, if you transmit any data without HTTPS **in theory** it could be intercepted. So in a nutshell, if you use compactbro server-side and you live in a free/democratic country, there's not much to worry about. Yet in case you are concerned about government surveillance or are just a little bit paranoid, there's an option to use HTTPS built into Compactbro. It could come handy if you want compactbro to become a drop-in replacement for `i.reddit.com`. Below are the steps to achieve this. The manual is (work-in-progress), it covers only Windows+Firefox setup but it should work basically anywhere with little changes.
 
-First of all, you need to specify make changes in your hosts file, on windows it is located at `C:\Windows\System32\drivers\etc/`. Open `hosts` file with text editor of your choice and add the following:
-```
-127.0.0.1 i.reddit.com
-```
-if you use compactbro on a remote server change `127.0.0.1` to its IP, below we use `127.0.0.1` as a placeholder, don't forget to edit it if needed.
-Then save and exit. You can verify it: (press Win+r => type `cmd` => enter and type following command):
-```
-ping i.reddit.com
-```
-You should see `127.0.0.1` IP address; sometimes changes require reboot to become active.
-
-The HTTPS however isn't operational yet, since any SSL connection requires a certificate. Install OpenSSL (there are binaries available for most platforms, refer to their site for more info) and generate SSL certs:
+To generate keys, install OpenSSL (there are binaries available for most platforms, refer to their site for more info) and generate SSL certs:
 ```shell
 cd <path-to-compactbro>/certs
 
 openssl ecparam -genkey -name prime256v1 -out key.pem
 
-openssl req -new -sha1 -key key.pem -out csr.csr -subj "/CN=i.reddit.com" -addext "subjectAltName=DNS:i.reddit.com,DNS:i.reddit.com,IP:127.0.0.1"
+openssl req -new -sha1 -key key.pem -out csr.csr -subj "/CN=i.reddit.com" -addext "subjectAltName=DNS:localhost,DNS:localhost,IP:127.0.0.1"
 
 openssl req -x509 -sha1 -days 365 -key key.pem -in csr.csr -out certificate.pem
 ```
-This will generate self-signed SSL certificate, which you have to import to your browser as a trusted root CA (for firefox: `settings` => `advanced` => `certificates` => `import`). Most likely the browser still won't allow you to visit `https://i.reddit.com/*` pages due to transport security (because the certificate had changed and could not be verified). Find your firefox profile folder and look for `SiteSecurityServiceState.txt` file. Although this is considered insecure you can simply delete/rename it or find records for `i.reddit.com` and remove them.
+This will generate self-signed SSL certificate, which you have to import to your browser as a trusted root CA (for firefox: `settings` => `advanced` => `certificates` => `import`). 
 
 Then open your `compactbro.toml` config file. All HTTPS settings are stored in the respective section which should look like this (you can append it to the end of the file):
 ```toml
@@ -119,7 +101,8 @@ KeyPath = "/certs/key.pem"
 CRTPath = "/certs/certificate.pem"
 ```
 
-You will need to "Add security exception" when visiting https://i.reddit.com for the first time. During these operations you will see a lot of security here-be-dragons-like warnings. In general it is safe to ignore them since you are dealing with certificates you just signed yourself, but note that you do everything at your own risk.
+You will need to "Add security exception" when visiting https://localhost/ for the first time. During these operations you will see a lot of security here-be-dragons-like warnings. In general it is safe to ignore them since you are dealing with certificates you just signed yourself, but note that you do everything at your own risk.
+You can use your own domain as well.
 
 ## V1 roadmap
 - [x] Front page
