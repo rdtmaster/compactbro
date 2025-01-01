@@ -30,7 +30,7 @@ jobs:
         id: bumpver
         with:
           current_version: ${{ steps.curver.outputs.ver }}
-          level: minor
+          level: patch
       - name: build-win-amd64
         run: go build -v -o bin/win64/${{env.BIN}}.exe
       - name: build-win32
