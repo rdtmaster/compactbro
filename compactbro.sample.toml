@@ -1,0 +1,30 @@
+EcoMode = true
+MarkMsgsUnreadOnView = true
+CheckMsgs = true
+Logging = true
+DisplayFlairEmojis = true
+NightMode = false
+DefaultLimit = 25
+LocalAddress = "127.0.0.1:80"
+
+[HTTPS]
+Use = true
+LocalAddress = "127.0.0.1:443"
+KeyPath = "/certs/key.pem"
+CRTPath = "/certs/certificate.pem"
+
+
+[Auth]
+Use = false
+Username = "user"
+Password = "pass"
+
+[Credentials]
+ID = "<ID>"
+Secret = "<Secret>"
+Username = "<user>"
+Password = "<pass>"
+
+[TemplateOptions]
+PrettyPrint = true
+LineNumbers = true

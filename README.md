@@ -4,12 +4,10 @@
 Miss the old reddit mobile web/compact/wap interface (`i.reddit.com`, `.compact`)? Worry not, CompactBro brings it back!
 
 1. Download & unzip a version for your platform -> https://github.com/rdtmaster/compactbro/releases/latest
-2. Rename `compactbro.sample.toml` -> `compactbro.toml`
+2. Rename `compactbro.sample.toml` -> `compactbro.toml` and copy to your default config directory
 3. From your reddit account, Create a new app with script access, then specify your `secret`, `id`, reddit login and password in `compactbro.toml`. Link to do it -> https://old.reddit.com/prefs/apps
 4. Launch the app
 5. http://localhost/ <- in your browser address bar
-
-More (much more!) details below
 
 ## what it is?
 A reddit client for web that focuses on fast load time, old browser compatability and delivering user experience similar or at least reasonably close to that provided by i.reddit.com mobile interface, also known as `.compact`.
@@ -44,12 +42,32 @@ compactbro.exe #on windows
 - Edit the config, it will look like this:
 
 ```toml
-EcoMode = false
+EcoMode = true
+MarkMsgsUnreadOnView = true
+CheckMsgs = true
+Logging = true
+DisplayFlairEmojis = true
+NightMode = false
+DefaultLimit = 25
+LocalAddress = "127.0.0.1:80"
+
+[HTTPS]
+Use = true
+LocalAddress = "127.0.0.1:443"
+KeyPath = "/certs/key.pem"
+CRTPath = "/certs/certificate.pem"
+
+
+[Auth]
+Use = false
+Username = "user"
+Password = "pass"
+
 [Credentials]
 ID = "<ID>"
 Secret = "<Secret>"
-Username = "<My-reddit-username>"
-Password = "<My-reddit-password>"
+Username = "<user>"
+Password = "<pass>"
 
 [TemplateOptions]
 PrettyPrint = true
