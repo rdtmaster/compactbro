@@ -23,6 +23,15 @@ function hide(elem){
 function show(elem){
 	elem.classList.remove('hidden');
 }
+
+function isHidden(elem){
+	return elem.classList.contains('hidden');
+}
+
+function isShown(elem){
+	return !isHidden(elem);
+}
+
 function togDisplay(elem){
 	if (elem.classList.contains('hidden')) {
 		show(elem);
@@ -137,24 +146,6 @@ function setEvents(thing){
 }
 
 
-
-//------- Event Listeners -------
-
-function backgroundUnread(){
-	if (document.getElementById('msgTrigger')){
-		return;
-	}
-	fetch(baseURL+'/checkunread/', {method: 'HEAD', credentials: 'include'}).then(r =>{
-		if (r.status === 200){
-			const mail = document.getElementById('mail');
-			const mailcl = mail.classList;
-			mail.href='/message/unread/';
-			mailcl.remove('nohavemail');
-			mailcl.add('havemail');
-		}
-	});
-}
-
 function get(url){
 	return fetch(baseURL+url, {method: 'GET', credentials: 'include'});
 }
@@ -172,13 +163,22 @@ function pst(url,json){
 	});
 }
 
-function isHidden(elem){
-	return elem.classList.contains('hidden');
+
+function backgroundUnread(){
+	if (document.getElementById('msgTrigger')){
+		return;
+	}
+	fetch(baseURL+'/checkunread/', {method: 'HEAD', credentials: 'include'}).then(r =>{
+		if (r.status === 200){
+			const mail = document.getElementById('mail');
+			const mailcl = mail.classList;
+			mail.href='/message/unread/';
+			mailcl.remove('nohavemail');
+			mailcl.add('havemail');
+		}
+	});
 }
 
-function isShown(elem){
-	return !isHidden(elem);
-}
 
 function optionsDisplay(id){
 	togDisplay(document.getElementById(id).getElementsByClassName('options_expando')[0]);
