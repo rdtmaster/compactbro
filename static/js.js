@@ -144,7 +144,7 @@ function backgroundUnread(){
 	if (document.getElementById('msgTrigger')){
 		return;
 	}
-	fetch(baseURL+'/checkunread/', {method: 'HEAD'}).then(r =>{
+	fetch(baseURL+'/checkunread/', {method: 'HEAD', credentials: 'include'}).then(r =>{
 		if (r.status === 200){
 			const mail = document.getElementById('mail');
 			const mailcl = mail.classList;
@@ -156,12 +156,13 @@ function backgroundUnread(){
 }
 
 function get(url){
-	return fetch(baseURL+url, {method: 'GET'});
+	return fetch(baseURL+url, {method: 'GET', credentials: 'include'});
 }
 
 function pst(url,json){
 	return fetch(baseURL+url, {
 		method: 'POST',
+		credentials: 'include',
 		headers: {
 			'Accept': 'application/json',
 			'Content-Type': 'application/json',
