@@ -37,6 +37,8 @@ html[xmlns="http://www.w3.org/1999/xhtml"][lang="en"]
 				a#topmenu_toggle.topbar-options[href="#"]
 			div#top_menu.hidden
 				div.menuitem
+					a[href="/u/"+getMe()]#{getMe()}
+				div.menuitem
 					a[href="/stop/"] Stop
 					
 		block subtoolbar

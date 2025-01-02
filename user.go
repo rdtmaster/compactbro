@@ -1,14 +1,18 @@
 package main
 
 import (
-	"github.com/rdtmaster/go-reddit/v4/reddit"
-	"fmt"
-	"sort"
-	"time"
 	"net/http"
-	"github.com/labstack/echo/v4"
+	"sort"
 	"strings"
+	"time"
+
+	"github.com/labstack/echo/v4"
+	"github.com/rdtmaster/go-reddit/v4/reddit"
 )
+
+func getMe() string {
+	return config.Credentials.Username
+}
 
 // This function must be reworked or retested, hard to believe it actually works
 func getOverview(c echo.Context, username, after, page, sorting, tpl string) error {
@@ -35,7 +39,6 @@ func getOverview(c echo.Context, username, after, page, sorting, tpl string) err
 	if err != nil {
 		return c.String(http.StatusInternalServerError, err.Error())
 	}
-	fmt.Println("==== after", after)
 	a := make([]PostOrComment, len(posts)+len(comments))
 	i := 0
 	for _, post := range posts {

@@ -7,21 +7,23 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
-	"github.com/BurntSushi/toml"
-	"github.com/kirsle/configdir"
 	"strings"
 	"time"
+
+	"github.com/BurntSushi/toml"
 	"github.com/eknkc/amber"
+	"github.com/kirsle/configdir"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	"github.com/rdtmaster/go-reddit/v4/reddit"
 )
 
 const emptyHTML = template.HTML("")
+
 var (
 	config CompactConfig
 	server *echo.Echo
-	tpls map[string]*template.Template
+	tpls   map[string]*template.Template
 	client *reddit.Client
 )
 
@@ -72,6 +74,7 @@ func main() {
 	amber.FuncMap["strNotEmpty"] = strNotEmpty
 	amber.FuncMap["hasReplies"] = hasReplies
 	amber.FuncMap["processReplies"] = processReplies
+	amber.FuncMap["getMe"] = getMe
 	tpls, err = amber.CompileDir("templates",
 		amber.DirOptions{Ext: ".amber", Recursive: true},
 		config.TemplateOptions)
