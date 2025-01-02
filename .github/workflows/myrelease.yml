@@ -31,6 +31,9 @@ jobs:
         with:
           current_version: ${{ steps.curver.outputs.ver }}
           level: patch
+      - uses: actions/setup-go@v5
+        with: go-version: '1.20.14'
+      - run: go version
       - name: build-win-amd64
         run: go build -v -o bin/win64/${{env.BIN}}.exe
       - name: build-win32
