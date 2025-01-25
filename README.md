@@ -1,3 +1,6 @@
+> [!WARNING]
+> Sadly and unfortunately, reddit will eventually shadow-ban your account if you use a third party client, including CompactBro. **Using this software will get you banned!** This is purely reddit's decision and nothing could be done about it.
+
 # CompactBro
 **Warning**: This software is yet to reach v1. Some functions are simply unimplemented; development started in spring of 2023, after reddit removed `/.compact` functionality, however once the use of `.i` and a relevant userscript has been discovered, this project has been immediately obendened (v0.83.0) and stood there until the end of 2024. In spring of 2024 the `.i` has been shut down by reddit as well, but since the author pretty much left reddit at that time it was barely noticed and no effort has been taken to develop the software and move it towards v1. Now I decided to release it as is, allowing to browse and make comments/replies.
 
